@@ -1,0 +1,6 @@
+node_modules/
+config
+clientStart/node_modules/
+clientStart/build
+package-lock.json
+clientStart/package-lock.json

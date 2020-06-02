@@ -1,0 +1,14 @@
+{
+    "name": "reacthaha",
+    "version": "1.0.0",
+    "description": "Hello React",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server"
+    },
+    "author": "Ali Hassan",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}

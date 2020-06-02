@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Video Broadcasting</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(
+                /[?&]+([^=&]+)=([^&]*)/gi,
+                function(m, key, value) {
+                    vars[key] = value;
+                }
+            );
+            return vars;
+        }
+    </script>
+
+    <script>
+        document.createElement("article");
+    </script>
+
+    <script src="https://www.webrtc-experiment.com/DetectRTC.js"></script>
+
+    <script src="https://www.webrtc-experiment.com/socket.io.js"></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="https://www.webrtc-experiment.com/IceServersHandler.js"></script>
+    <script src="https://www.webrtc-experiment.com/CodecsHandler.js"></script>
+    <script src="https://www.webrtc-experiment.com/RTCPeerConnection-v1.5.js"></script>
+    <script src="https://www.webrtc-experiment.com/webrtc-broadcasting/broadcast.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <article>
+            <section class="experiment">
+                <section style="display:none">
+                    <select id="broadcasting-option">
+              <option>Video</option>
+            </select>
+                    <input type="text" id="broadcast-name" />
+                    <button id="setup-new-broadcast" class="setup">
+              Setup New Broadcast
+            </button>
+                </section>
+
+                <!-- list of all available broadcasting rooms -->
+                <table id="rooms-list"></table>
+
+                <!-- local/remote videos container -->
+                <div class="row">
+                    <div class="col-md-2, col-lg-2, col-sm-2"></div>
+                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="videos-container" style="width:800px; margin:0 auto; padding: 50px 10px 20px 30px;"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4, col-lg-4, col-sm-4"></div>
+                    <div id="buttons" class="col-sm-4, col-md-4, col-lg-4, col-xs-4"></div>
+                </div>
+            </section>
+
+            <script>
+                var config = {
+                    openSocket: function(config) {
+                        var SIGNALING_SERVER =
+                            "https://socketio-over-nodejs2.herokuapp.com:443/";
+                        config.channel = config.channel || getUrlVars()["id"];
+                        var sender = getUrlVars()["u"];
+                        io.connect(SIGNALING_SERVER).emit("new-channel", {
+                            channel: config.channel,
+                            sender: sender
+                        });
+                        var socket = io.connect(SIGNALING_SERVER + config.channel);
+                        socket.channel = config.channel;
+                        socket.on("connect", function() {
+                            if (config.callback) config.callback(socket);
+                        });
+                        socket.send = function(message) {
+                            socket.emit("message", {
+                                sender: sender,
+                                data: message
+                            });
+                        };
+                        socket.on("message", config.onmessage);
+                    },
+                    onRemoteStream: function(htmlElement) {
+                        videosContainer.appendChild(htmlElement);
+                        // rotateInCircle(htmlElement);
+                    },
+                    onRoomFound: function(room) {
+                        var alreadyExist = document.querySelector(
+                            'button[data-broadcaster="' + room.broadcaster + '"]'
+                        );
+                        if (alreadyExist) return;
+                        if (typeof roomsList === "undefined") roomsList = document.body;
+                        var tr = document.createElement("tr");
+                        tr.innerHTML =
+                            '<td><button class="join btn btn-info">Join</button></td>';
+                        var b = document.getElementById("buttons");
+                        b.appendChild(tr);
+                        var joinRoomButton = tr.querySelector(".join");
+                        joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
+                        joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
+                        joinRoomButton.onclick = function() {
+                            this.disabled = true;
+                            var broadcaster = this.getAttribute("data-broadcaster");
+                            var roomToken = this.getAttribute("data-roomToken");
+                            broadcastUI.joinRoom({
+                                roomToken: roomToken,
+                                joinUser: broadcaster
+                            });
+                            hideUnnecessaryStuff();
+                        };
+                    },
+                    onNewParticipant: function(numberOfViewers) {
+                        document.title = "Viewers: " + numberOfViewers;
+                    },
+                    onReady: function() {
+                        console.log("now you can open or join rooms");
+                    }
+                };
+
+                function setupNewBroadcastButtonClickHandler() {
+                    document.getElementById("broadcast-name").disabled = true;
+                    document.getElementById("setup-new-broadcast").disabled = true;
+                    DetectRTC.load(function() {
+                        captureUserMedia(function() {
+                            var shared = "video";
+                            if (getUrlVars()["a"] == "audio") {
+                                shared = "audio";
+                            }
+                            if (getUrlVars()["s"] == "screen") {
+                                shared = "screen";
+                            }
+                            broadcastUI.createRoom({
+                                roomName:
+                                    (document.getElementById("broadcast-name") || {}).value ||
+                                    "Anonymous",
+                                isAudio: shared === "audio"
+                            });
+                        });
+                        hideUnnecessaryStuff();
+                    });
+                }
+
+                function captureUserMedia(callback) {
+                    var constraints = null;
+                    window.option = broadcastingOption ? broadcastingOption.value : "";
+                    if (getUrlVars()["a"] === "audio") {
+                        constraints = {
+                            audio: true,
+                            video: false
+                        };
+                        if (DetectRTC.hasMicrophone !== true) {
+                            alert(
+                                "DetectRTC library is unable to find microphone; maybe you denied microphone access once and it is still denied or maybe microphone device is not attached to your system or another app is using same microphone."
+                            );
+                        }
+                    }
+                    if (getUrlVars()["s"] === "screen") {
+                        var video_constraints = {
+                            mandatory: {
+                                chromeMediaSource: "screen"
+                            },
+                            optional: []
+                        };
+                        constraints = {
+                            audio: false,
+                            video: video_constraints
+                        };
+                        if (DetectRTC.isScreenCapturingSupported !== true) {
+                            alert(
+                                'DetectRTC library is unable to find screen capturing support. You MUST run chrome with command line flag "chrome --enable-usermedia-screen-capturing"'
+                            );
+                        }
+                    }
+                    if (
+                        getUrlVars()["a"] != "audio" &&
+                        getUrlVars()["s"] != "screen" &&
+                        DetectRTC.hasWebcam !== true
+                    ) {
+                        alert(
+                            "DetectRTC library is unable to find webcam; maybe you denied webcam access once and it is still denied or maybe webcam device is not attached to your system or another app is using same webcam."
+                        );
+                    }
+                    var htmlElement = document.createElement(
+                        option === "Only Audio" ? "audio" : "video"
+                    );
+                    htmlElement.muted = true;
+                    htmlElement.volume = 0;
+                    try {
+                        htmlElement.setAttributeNode(
+                            document.createAttribute("autoplay")
+                        );
+                        htmlElement.setAttributeNode(
+                            document.createAttribute("playsinline")
+                        );
+                        htmlElement.setAttributeNode(
+                            document.createAttribute("controls")
+                        );
+                    } catch (e) {
+                        htmlElement.setAttribute("autoplay", true);
+                        htmlElement.setAttribute("playsinline", true);
+                        htmlElement.setAttribute("controls", true);
+                    }
+                    var mediaConfig = {
+                        video: htmlElement,
+                        onsuccess: function(stream) {
+                            config.attachStream = stream;
+
+                            videosContainer.appendChild(htmlElement);
+                            // rotateInCircle(htmlElement);
+
+                            callback && callback();
+                        },
+                        onerror: function() {
+                            if (option === "Only Audio")
+                                alert("unable to get access to your microphone");
+                            else if (option === "Screen") {
+                                if (location.protocol === "http:")
+                                    alert("Please test this WebRTC experiment on HTTPS.");
+                                else
+                                    alert(
+                                        'Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?'
+                                    );
+                            } else alert("unable to get access to your webcam");
+                        }
+                    };
+                    if (constraints) mediaConfig.constraints = constraints;
+                    getUserMedia(mediaConfig);
+                }
+                var broadcastUI = broadcast(config);
+                /* UI specific */
+                var videosContainer =
+                    document.getElementById("videos-container") || document.body;
+                var setupNewBroadcast = document.getElementById(
+                    "setup-new-broadcast"
+                );
+                var roomsList = document.getElementById("rooms-list");
+                var broadcastingOption = document.getElementById(
+                    "broadcasting-option"
+                );
+                var a = document.getElementById("buttons");
+                if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
+                    setupNewBroadcastButtonClickHandler();
+                    var node2 = document.createElement("button");
+                    var textnode2 = document.createTextNode("Stop Broadcast");
+                    node2.setAttribute("class", "btn btn-danger");
+
+                    node2.appendChild(textnode2);
+                    node2.onclick = function() {
+                        window.close();
+                    };
+                    a.appendChild(node2);
+                    var node = document.createElement("button");
+                    node.setAttribute("class", "btn btn-info");
+                    var textnode = document.createTextNode("Switch Broadcast");
+                    node.appendChild(textnode);
+                    node.onclick = function() {
+                        if (getUrlVars()["s"] === "screen") {
+                            location.replace(
+                                "?id=" +
+                                getUrlVars()["id"] +
+                                "&u=" +
+                                getUrlVars()["u"] +
+                                "&s=video&q=start"
+                            );
+                        }
+                        if (getUrlVars()["s"] === "video") {
+                            location.replace(
+                                "?id=" +
+                                getUrlVars()["id"] +
+                                "&u=" +
+                                getUrlVars()["u"] +
+                                "&s=screen&q=start"
+                            );
+                        }
+
+                        // window.location.reload()
+                    };
+                    a.appendChild(node);
+                } else {
+                    var node = document.createElement("button");
+                    node.setAttribute("class", "btn btn-info");
+                    var textnode = document.createTextNode("Leave Broadcast");
+                    node.appendChild(textnode);
+                    node.onclick = function() {
+                        window.close();
+                    };
+                    a.appendChild(node);
+                }
+
+                function hideUnnecessaryStuff() {
+                    var visibleElements = document.getElementsByClassName("visible"),
+                        length = visibleElements.length;
+                    for (var i = 0; i < length; i++) {
+                        visibleElements[i].style.display = "none";
+                    }
+                }
+
+                function rotateInCircle(video) {
+                    video.style[
+                        navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+                    ] = "rotate(0deg)";
+                    setTimeout(function() {
+                        video.style[
+                            navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+                        ] = "rotate(360deg)";
+                    }, 1000);
+                }
+            </script>
+        </article>
+    </div>
+</body>
+
+</html>
