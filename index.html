@@ -39,7 +39,7 @@
     <div class="container">
         <article>
             <section class="experiment">
-                <section style="display:none">
+                <section style="display: none;">
                     <select id="broadcasting-option">
               <option>Video</option>
             </select>
@@ -55,7 +55,11 @@
                 <!-- local/remote videos container -->
                 <div class="row">
                     <div class="col-md-2, col-lg-2, col-sm-2"></div>
-                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="videos-container" style="width:800px; margin:0 auto; padding: 50px 10px 20px 30px;"></div>
+                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="videos-container" style="
+                width: 800px;
+                margin: 0 auto;
+                padding: 50px 10px 20px 30px;
+              "></div>
                 </div>
                 <div class="row">
                     <div class="col-md-4, col-lg-4, col-sm-4"></div>
@@ -72,7 +76,7 @@
                         var sender = getUrlVars()["u"];
                         io.connect(SIGNALING_SERVER).emit("new-channel", {
                             channel: config.channel,
-                            sender: sender
+                            sender: sender,
                         });
                         var socket = io.connect(SIGNALING_SERVER + config.channel);
                         socket.channel = config.channel;
@@ -82,7 +86,7 @@
                         socket.send = function(message) {
                             socket.emit("message", {
                                 sender: sender,
-                                data: message
+                                data: message,
                             });
                         };
                         socket.on("message", config.onmessage);
@@ -111,7 +115,7 @@
                             var roomToken = this.getAttribute("data-roomToken");
                             broadcastUI.joinRoom({
                                 roomToken: roomToken,
-                                joinUser: broadcaster
+                                joinUser: broadcaster,
                             });
                             hideUnnecessaryStuff();
                         };
@@ -121,7 +125,7 @@
                     },
                     onReady: function() {
                         console.log("now you can open or join rooms");
-                    }
+                    },
                 };
 
                 function setupNewBroadcastButtonClickHandler() {
@@ -140,7 +144,7 @@
                                 roomName:
                                     (document.getElementById("broadcast-name") || {}).value ||
                                     "Anonymous",
-                                isAudio: shared === "audio"
+                                isAudio: shared === "audio",
                             });
                         });
                         hideUnnecessaryStuff();
@@ -153,7 +157,7 @@
                     if (getUrlVars()["a"] === "audio") {
                         constraints = {
                             audio: true,
-                            video: false
+                            video: false,
                         };
                         if (DetectRTC.hasMicrophone !== true) {
                             alert(
@@ -164,13 +168,13 @@
                     if (getUrlVars()["s"] === "screen") {
                         var video_constraints = {
                             mandatory: {
-                                chromeMediaSource: "screen"
+                                chromeMediaSource: "screen",
                             },
-                            optional: []
+                            optional: [],
                         };
                         constraints = {
                             audio: false,
-                            video: video_constraints
+                            video: video_constraints,
                         };
                         if (DetectRTC.isScreenCapturingSupported !== true) {
                             alert(
@@ -211,7 +215,10 @@
                         video: htmlElement,
                         onsuccess: function(stream) {
                             config.attachStream = stream;
-
+                            var x = document.createElement("p");
+                            var t = document.createTextNode("Paragraph is created.");
+                            x.appendChild(t);
+                            document.body.appendChild(x);
                             videosContainer.appendChild(htmlElement);
                             // rotateInCircle(htmlElement);
 
@@ -228,7 +235,7 @@
                                         'Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?'
                                     );
                             } else alert("unable to get access to your webcam");
-                        }
+                        },
                     };
                     if (constraints) mediaConfig.constraints = constraints;
                     getUserMedia(mediaConfig);
@@ -246,7 +253,9 @@
                 );
                 var a = document.getElementById("buttons");
                 if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
+                    console.log("Here");
                     setupNewBroadcastButtonClickHandler();
+
                     var node2 = document.createElement("button");
                     var textnode2 = document.createTextNode("Stop Broadcast");
                     node2.setAttribute("class", "btn btn-danger");
