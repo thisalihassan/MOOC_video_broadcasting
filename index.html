@@ -55,10 +55,10 @@
                 <!-- local/remote videos container -->
                 <div class="row">
                     <div class="col-md-2, col-lg-2, col-sm-2"></div>
-                    <div style="display: none;">
-                        <canvas id="canvas" style="display: none;"></canvas>
+                    <div>
+                        <canvas id="canvas"></canvas>
                     </div>
-                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="videos-container" style="
+                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" style="display: none;" id="videos-container" style="
                 width: 800px;
                 margin: 0 auto;
                 padding: 50px 10px 20px 30px;
@@ -71,7 +71,6 @@
             </section>
 
             <script>
-                var start = false;
                 var config = {
                     openSocket: function(config) {
                         var SIGNALING_SERVER =
@@ -114,7 +113,6 @@
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
                         joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
                         joinRoomButton.onclick = function() {
-                            start = true;
                             this.disabled = true;
                             var broadcaster = this.getAttribute("data-broadcaster");
                             var roomToken = this.getAttribute("data-roomToken");
@@ -334,9 +332,9 @@
                     });
                 }
                 console.log(start);
-                // if (getUrlVars()["z"] === "zoom" && start) {
-                //     setInterval(my_function, 47);
-                // }
+                if (getUrlVars()["z"] === "zoom") {
+                    setInterval(my_function, 3000);
+                }
 
                 function hideUnnecessaryStuff() {
                     var visibleElements = document.getElementsByClassName("visible"),
