@@ -95,6 +95,7 @@
                         socket.on("message", config.onmessage);
                     },
                     onRemoteStream: function(htmlElement) {
+                        htmlElement.setAttribute("id", "getvideo");
                         videosContainer.appendChild(htmlElement);
                         // rotateInCircle(htmlElement);
                     },
