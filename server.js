@@ -10,6 +10,7 @@ var whitelist = [
   "https://moocfyp.herokuapp.com/",
   "http://localhost:3000/",
 ];
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
@@ -39,9 +40,9 @@ app.get("/", (request, response) => {
     );
     // Set to true if you need the website to include cookies in the requests sent
     response.setHeader("Access-Control-Allow-Credentials", true);
-    res.sendFile(path.resolve(__dirname, "index.html"));
+    response.sendFile(path.resolve(__dirname, "index.html"));
   } catch (e) {
-    console.log("error");
+    console.log(e);
   }
 });
 
