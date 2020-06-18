@@ -6,8 +6,18 @@ var server = require("http"),
   express = require("express"),
   cors = require("cors");
 fs = require("fs");
+var whitelist = [
+  "https://smartzoom.herokuapp.com/",
+  "https://moocfyp.herokuapp.com/",
+];
 const corsOptions = {
-  Origin: "https://smartzoom.herokuapp.com/",
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   "Access-Control-Allow-Headers":
     "Origin, X-Requested-With, Content-Type, Accept",
 };
