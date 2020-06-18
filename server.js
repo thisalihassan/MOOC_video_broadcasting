@@ -10,15 +10,15 @@ var whitelist = [
   "https://moocfyp.herokuapp.com/",
   "http://localhost:3000/",
 ];
-
+// origin: function (origin, callback) {
+//   if (whitelist.indexOf(origin) !== -1) {
+//     callback(null, true);
+//   } else {
+//     callback(new Error("Not allowed by CORS"));
+//   }
+// },
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: whitelist,
   "Access-Control-Allow-Headers":
     "Origin, X-Requested-With, Content-Type, Accept",
 };
