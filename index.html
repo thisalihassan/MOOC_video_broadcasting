@@ -55,10 +55,10 @@
                 <!-- local/remote videos container -->
                 <div class="row">
                     <div class="col-md-2, col-lg-2, col-sm-2"></div>
-                    <div>
+                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="canvasid">
                         <canvas id="canvas"></canvas>
                     </div>
-                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" style="display: none;" id="videos-container" style="
+                    <div class="col-sm-8, col-md-8, col-lg-8, col-xs-4" id="videos-container" style="
                 width: 800px;
                 margin: 0 auto;
                 padding: 50px 10px 20px 30px;
@@ -258,6 +258,8 @@
                 );
                 var a = document.getElementById("buttons");
                 if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
+                    document.getElementById("videos-container").style.display = "block";
+                    document.getElementById("canvasid").style.display = "none";
                     setupNewBroadcastButtonClickHandler();
 
                     var node2 = document.createElement("button");
@@ -308,7 +310,6 @@
                 }
 
                 function my_function() {
-                    var canvas = document.getElementById("canvas");
                     var video = document.getElementById("getvideo");
                     ratio = video.videoWidth / video.videoHeight;
                     w = video.videoWidth - 100;
@@ -317,9 +318,11 @@
                     canvas.height = h;
                     // canvas.getContext("2d").fillRect(0, 0, w, h);
                     canvas.getContext("2d").drawImage(video, 0, 0, w, h); //video is the video element in html which is recieving live data from webcam
+                }
 
+                function getAction() {
+                    var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
-
                     $.ajax({
                         data: imgURL,
                         processData: false,
@@ -331,9 +334,12 @@
                         console.log("getVideo" + data);
                     });
                 }
-                console.log(start);
+
                 if (getUrlVars()["z"] === "zoom") {
-                    setInterval(my_function, 3000);
+                    document.getElementById("videos-container").style.display = "none";
+                    document.getElementById("canvasid").style.display = "block";
+                    setInterval(my_function, 50);
+                    setInterval(getAction, 1000);
                 }
 
                 function hideUnnecessaryStuff() {
@@ -343,17 +349,6 @@
                         visibleElements[i].style.display = "none";
                     }
                 }
-
-                // function rotateInCircle(video) {
-                //     video.style[
-                //         navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
-                //     ] = "rotate(0deg)";
-                //     setTimeout(function() {
-                //         video.style[
-                //             navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
-                //         ] = "rotate(360deg)";
-                //     }, 1000);
-                // }
             </script>
         </article>
     </div>
