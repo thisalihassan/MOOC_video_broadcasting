@@ -6,9 +6,13 @@
     "scripts": {
         "start": "node server"
     },
+    "routes": {
+        "cors": true
+    },
     "author": "Ali Hassan",
     "license": "MIT",
     "dependencies": {
+        "cors": "^2.8.5",
         "express": "^4.17.1"
     }
 }
