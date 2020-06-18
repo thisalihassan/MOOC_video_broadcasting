@@ -96,6 +96,7 @@
                     },
                     onRemoteStream: function(htmlElement) {
                         htmlElement.setAttribute("id", "getvideo");
+                        console.log("Here");
                         videosContainer.appendChild(htmlElement);
                         // rotateInCircle(htmlElement);
                     },
@@ -258,6 +259,7 @@
                     "broadcasting-option"
                 );
                 var a = document.getElementById("buttons");
+                document.getElementById("canvasid").style.display = "none";
                 if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
                     document.getElementById("videos-container").style.display = "block";
                     document.getElementById("canvasid").style.display = "none";
