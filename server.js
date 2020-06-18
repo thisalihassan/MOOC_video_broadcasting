@@ -8,6 +8,7 @@ fs = require("fs");
 var whitelist = [
   "https://smartzoom.herokuapp.com/",
   "https://moocfyp.herokuapp.com/",
+  "http://localhost:3000/",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
