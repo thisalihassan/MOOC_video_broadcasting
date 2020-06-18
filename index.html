@@ -203,6 +203,9 @@
                     htmlElement.volume = 0;
                     try {
                         htmlElement.setAttributeNode(
+                            document.createAttribute("autoplay")
+                        );
+                        htmlElement.setAttributeNode(
                             document.createAttribute("playsinline")
                         );
                         htmlElement.setAttributeNode(
@@ -210,6 +213,7 @@
                         );
                         htmlElement.setAttribute("id", "getvideo");
                     } catch (e) {
+                        htmlElement.setAttribute("autoplay", true);
                         htmlElement.setAttribute("playsinline", true);
                         htmlElement.setAttribute("controls", true);
                         htmlElement.setAttribute("id", "getvideo");

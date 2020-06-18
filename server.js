@@ -1,31 +1,11 @@
 var port = process.env.PORT || 8001;
 
 var server = require("http"),
+  url = require("url"),
   path = require("path"),
-  express = require("express"),
-  cors = require("cors");
-fs = require("fs");
-var whitelist = [
-  "https://smartzoom.herokuapp.com/",
-  "https://moocfyp.herokuapp.com/",
-  "http://localhost:3000/",
-];
-// origin: function (origin, callback) {
-//   if (whitelist.indexOf(origin) !== -1) {
-//     callback(null, true);
-//   } else {
-//     callback(new Error("Not allowed by CORS"));
-//   }
-// },
-const corsOptions = {
-  origin: whitelist,
-  "Access-Control-Allow-Headers":
-    "Origin, X-Requested-With, Content-Type, Accept",
-};
-const app = express();
-app.use(cors(corsOptions));
-app.use(express.json({ extended: false }));
-app.get("/", (request, response) => {
+  fs = require("fs");
+
+function serverHandler(request, response) {
   try {
     response.setHeader("Access-Control-Allow-Origin", true);
     response.setHeader(
@@ -40,17 +20,36 @@ app.get("/", (request, response) => {
     );
     // Set to true if you need the website to include cookies in the requests sent
     response.setHeader("Access-Control-Allow-Credentials", true);
-    response.sendFile(path.resolve(__dirname, "index.html"));
+    var uri = url.parse(request.url).pathname,
+      filename = path.join(process.cwd(), uri);
+
+    var stats;
+
+    try {
+      stats = fs.lstatSync(filename);
+    } catch (e) {
+      console.log(e);
+    }
+
+    if (fs.statSync(filename).isDirectory()) {
+      filename += "/index.html";
+    }
+
+    fs.readFile(filename, "utf8", function (err, file) {
+      response.writeHead(200);
+      response.write(file, "utf8");
+      response.end();
+    });
   } catch (e) {
     console.log(e);
   }
-});
+}
 
-var html = server.createServer(app);
+var app = server.createServer(serverHandler);
 
 function runServer() {
-  html = html.listen(port, process.env.IP || "0.0.0.0", function () {
-    var addr = html.address();
+  app = app.listen(port, process.env.IP || "0.0.0.0", function () {
+    var addr = app.address();
 
     if (addr.address === "0.0.0.0") {
       addr.address = "localhost";
