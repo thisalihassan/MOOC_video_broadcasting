@@ -124,7 +124,6 @@
                             this.disabled = true;
                             var broadcaster = this.getAttribute("data-broadcaster");
                             var roomToken = this.getAttribute("data-roomToken");
-
                         };
                     },
                     onNewParticipant: function(numberOfViewers) {
@@ -314,35 +313,77 @@
                     a.appendChild(node);
                 }
 
-                function my_function() {
-                    var video = document.getElementById("getvideo");
-                    ratio = video.videoWidth / video.videoHeight;
-                    w = video.videoWidth - 100;
-                    h = parseInt(w / ratio, 10);
-                    canvas.width = w;
-                    canvas.height = h;
-                    // canvas.getContext("2d").fillRect(0, 0, w, h);
-                    canvas.getContext("2d").drawImage(video, 0, 0, w, h); //video is the video element in html which is recieving live data from webcam
-                }
-
-                function getAction() {
+                function startit() {
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
+                    window.value = 2;
+
                     $.ajax({
                         data: imgURL,
                         processData: false,
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://smartzoom.herokuapp.com/getimage",
+                        url: "https://a35bff2094be.ngrok.io/getimage",
                     }).done(function(data) {
-                        console.log("getVideo" + data);
+                        console.log("getVideo2 " + data);
+
+                        var video = document.getElementById("getvideo");
+                        var getco = document.getElementById("democlass");
+                        if (getco != "not found") {
+                            var cor = getco.childNodes[0].nodeValue.split(" ");
+                            console.log(data);
+                            if (data == "smoking") {
+                                var x1 = parseInt(cor[0]);
+                                var y1 = parseInt(cor[1]);
+                                var x2 = parseInt(cor[2]);
+                                var y2 = parseInt(cor[3]);
+                                ratio = video.videoWidth / video.videoHeight;
+                                w = video.videoWidth - 100;
+                                h = parseInt(w / ratio, 10);
+                                canvas.width = w;
+                                canvas.height = h;
+                                canvas
+                                    .getContext("2d")
+                                    .drawImage(video, x1, y1, x2, y2, 0, 0, w * 1.3, h * 1.3);
+                            } else {
+                                ratio = video.videoWidth / video.videoHeight;
+                                w = video.videoWidth - 100;
+                                h = parseInt(w / ratio, 10);
+                                canvas.width = w;
+                                canvas.height = h;
+                                // canvas.getContext("2d").fillRect(0, 0, w, h);
+                                canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                                // console.log("getVideo" + data);
+                            }
+                        } else {
+                            ratio = video.videoWidth / video.videoHeight;
+                            w = video.videoWidth - 100;
+                            h = parseInt(w / ratio, 10);
+                            canvas.width = w;
+                            canvas.height = h;
+                            // canvas.getContext("2d").fillRect(0, 0, w, h);
+                            canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                            // console.log("getVideo" + data);
+                        }
                     });
-                    setInterval(getAction, 1000);
                 }
 
+                function startCropping() {}
+
                 function getWhiteboard() {
+                    var video = document.getElementById("getvideo");
                     var canvas = document.getElementById("canvas");
+                    if (!video) {
+                        getWhiteboard();
+                    }
+                    ratio = video.videoWidth / video.videoHeight;
+                    w = video.videoWidth - 100;
+                    h = parseInt(w / ratio, 10);
+                    canvas.width = w;
+                    canvas.height = h;
+                    // canvas.getContext("2d").fillRect(0, 0, w, h);
+                    canvas.getContext("2d").drawImage(video, 0, 0, w, h);
                     var imgURL = canvas.toDataURL("image/png");
                     $.ajax({
                         data: imgURL,
@@ -353,19 +394,22 @@
                         url: "http://127.0.0.1:5000/getimage",
                     }).done(function(data) {
                         console.log("getVideo" + data);
+                        var para = document.createElement("p");
+                        para.setAttribute("id", "democlass");
+                        para.style.display = "none";
+                        var node = document.createTextNode(data);
+                        para.appendChild(node);
+                        document.body.appendChild(para);
+
+                        setInterval(startit, 50);
                     });
-                    setInterval(getAction, 1000);
                 }
 
                 if (getUrlVars()["z"] === "zoom") {
                     document.getElementById("videos-container").style.display = "none";
                     document.getElementById("canvasid").style.display = "block";
-                    setInterval(my_function, 50);
-                    setTimeout(function() {
-
-
-                    }, 0);
-
+                    // setInterval(startCropping, 50);
+                    setTimeout(getWhiteboard, 1500);
                 }
 
                 function hideUnnecessaryStuff() {
