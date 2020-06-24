@@ -4,6 +4,15 @@ var server = require("http"),
   url = require("url"),
   path = require("path"),
   fs = require("fs");
+var multer = require("multer");
+var fileupload = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
 
 function serverHandler(request, response) {
   try {
@@ -22,6 +31,18 @@ function serverHandler(request, response) {
     response.setHeader("Access-Control-Allow-Credentials", true);
     var uri = url.parse(request.url).pathname,
       filename = path.join(process.cwd(), uri);
+
+    var isWin = !!process.platform.match(/^win/);
+
+    if (
+      filename &&
+      filename.toString().indexOf(isWin ? "\\uploadFile" : "/uploadFile") !=
+        -1 &&
+      request.method.toLowerCase() == "post"
+    ) {
+      uploadFile(request, response);
+      return;
+    }
 
     var stats;
 
@@ -58,5 +79,53 @@ function runServer() {
     console.log("Server listening at http://" + addr.address + ":" + addr.port);
   });
 }
+var fileuploads = multer({ storage: fileupload }).single("file");
+function uploadFile(request, response) {
+  fileuploads(request, response, async function (err) {
+    if (err instanceof multer.MulterError) {
+      return response.status(500).json(err);
+    } else if (err) {
+      return response.status(500).json(err);
+    }
+    return response;
+    // try {
+    //   const path = req.file.path;
+    //   const uniqueFilename = new Date().toISOString();
+    //   const result = await cloudinary.uploader.upload(path, {
+    //     public_id: `profile/${uniqueFilename}`,
+    //   });
+    //   url = result.secure_url;
+    // } catch (err) {
+    //   console.error(err.message);
+    //   res.status(500).send("Server Error");
+    // }
+  });
+  // // parse a file upload
+  // var mime = require("mime");
+  // var formidable = require("formidable");
+  // var util = require("util");
 
+  // var form = new formidable.IncomingForm()
+  //   .parse(request)
+  //   .on("file", function (name, file) {
+  //     console.log("Got file:", name);
+  //   });
+
+  // var dir = !!process.platform.match(/^win/) ? "\\uploads\\" : "/uploads/";
+
+  // form.uploadDir = __dirname + dir;
+  // form.keepExtensions = true;
+  // form.maxFieldsSize = 10 * 1024 * 1024;
+  // form.maxFields = 1000;
+  // form.multiples = false;
+
+  // form.parse(request, function (err, fields, files) {
+  //   // var file = util.inspect(files);
+  //   // console.log(file);
+  //   // var fileName = file.fileName;
+  //   var fileURL = "http://" + app.address + ":" + port + "/uploads/";
+
+  //   console.log("fileURL: ", fileURL);
+  // });
+}
 runServer();

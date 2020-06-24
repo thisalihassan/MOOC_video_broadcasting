@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/node_modules/recordrtc/RecordRTC.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         function getUrlVars() {
@@ -71,6 +72,7 @@
             </section>
 
             <script>
+                var recorder;
                 var config = {
                     openSocket: function(config) {
                         var SIGNALING_SERVER =
@@ -98,6 +100,19 @@
                         htmlElement.setAttribute("id", "getvideo");
                         console.log("Here");
                         videosContainer.appendChild(htmlElement);
+                        if (getUrlVars()["z"] === "zoom") {
+                            var para = document.createElement("input");
+                            para.setAttribute("type", "text");
+                            para.setAttribute("value", "no");
+                            para.setAttribute("id", "democlass2");
+                            para.style.display = "none";
+                            document.body.appendChild(para);
+                            document.getElementById("videos-container").style.display =
+                                "none";
+                            document.getElementById("canvasid").style.display = "block";
+                            // setInterval(startCropping, 50);
+                            setTimeout(getWhiteboard, 1000);
+                        }
                         // rotateInCircle(htmlElement);
                     },
                     onRoomFound: function(room) {
@@ -106,11 +121,6 @@
                         );
                         if (alreadyExist) return;
                         if (typeof roomsList === "undefined") roomsList = document.body;
-                        broadcastUI.joinRoom({
-                            roomToken: room.broadcaster,
-                            joinUser: room.broadcaster,
-                        });
-
                         var tr = document.createElement("tr");
                         tr.innerHTML =
                             '<td><button class="join btn btn-info">Join</button></td>';
@@ -119,11 +129,15 @@
                         var joinRoomButton = tr.querySelector(".join");
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
                         joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
-                        hideUnnecessaryStuff();
                         joinRoomButton.onclick = function() {
                             this.disabled = true;
                             var broadcaster = this.getAttribute("data-broadcaster");
                             var roomToken = this.getAttribute("data-roomToken");
+                            broadcastUI.joinRoom({
+                                roomToken: roomToken,
+                                joinUser: broadcaster,
+                            });
+                            hideUnnecessaryStuff();
                         };
                     },
                     onNewParticipant: function(numberOfViewers) {
@@ -224,7 +238,11 @@
 
                         onsuccess: function(stream) {
                             htmlElement.setAttribute("id", "getvideo");
+                            recorder = RecordRTC(stream, {
+                                type: "video",
+                            });
 
+                            recorder.startRecording();
                             config.attachStream = stream;
 
                             videosContainer.appendChild(htmlElement);
@@ -267,12 +285,15 @@
                     setupNewBroadcastButtonClickHandler();
 
                     var node2 = document.createElement("button");
-                    var textnode2 = document.createTextNode("Stop Broadcast");
+                    node2.setAttribute("id", "uploadbut");
+                    var textnode2 = document.createTextNode("Upload Broadcasting");
                     node2.setAttribute("class", "btn btn-danger");
 
                     node2.appendChild(textnode2);
                     node2.onclick = function() {
-                        window.close();
+                        recorder.stopRecording(postFiles);
+                        alert("Savind Complete...You can close now!");
+                        document.getElementById("uploadbut").style.display = "none";
                     };
                     a.appendChild(node2);
                     var node = document.createElement("button");
@@ -308,15 +329,59 @@
                     var textnode = document.createTextNode("Leave Broadcast");
                     node.appendChild(textnode);
                     node.onclick = function() {
-                        window.close();
+                        close();
                     };
                     a.appendChild(node);
+                }
+
+                function postFiles() {
+                    var blob = recorder.getBlob();
+
+                    // getting unique identifier for the file name
+                    var name = getUrlVars()["f"] + ".webm";
+                    console.log(name);
+                    var file = new File([blob], name, {
+                        type: "video/webm",
+                    });
+                    var videoElement = document.createElement("video");
+                    videoElement.src = "";
+
+                    xhr("/uploadFile", file, function(responseText) {
+                        var fileURL = JSON.parse(responseText).fileURL;
+
+                        console.info("fileURL", fileURL);
+                        videoElement.src = fileURL;
+                        videoElement.play();
+                        videoElement.muted = false;
+                        videoElement.controls = true;
+
+                        document.querySelector("#footer-h2").innerHTML =
+                            '<a href="' +
+                            videoElement.src +
+                            '">' +
+                            videoElement.src +
+                            "</a>";
+                    });
+                }
+
+                function xhr(url, data, callback) {
+                    var request = new XMLHttpRequest();
+                    request.onreadystatechange = function() {
+                        if (request.readyState == 4 && request.status == 200) {
+                            callback(request.responseText);
+                        }
+                    };
+
+                    request.open("POST", url);
+
+                    var formData = new FormData();
+                    formData.append("file", data);
+                    request.send(formData);
                 }
 
                 function startit() {
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
-                    window.value = 2;
 
                     $.ajax({
                         data: imgURL,
@@ -324,38 +389,34 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://a35bff2094be.ngrok.io/getimage",
-                    }).done(function(data) {
-                        console.log("getVideo2 " + data);
+                        url: "https://139bad92b89e.ngrok.io/getimage",
+                    }).done(function(mdata) {
+                        console.log("getVideo2 " + mdata);
+                        var setdata = document.getElementById("democlass2");
+                        setdata.setAttribute("value", mdata);
+                    });
+                    console.log(document.getElementById("democlass2").value);
+                }
 
-                        var video = document.getElementById("getvideo");
-                        var getco = document.getElementById("democlass");
-                        if (getco != "not found") {
-                            var cor = getco.childNodes[0].nodeValue.split(" ");
-                            console.log(data);
-                            if (data == "smoking") {
-                                var x1 = parseInt(cor[0]);
-                                var y1 = parseInt(cor[1]);
-                                var x2 = parseInt(cor[2]);
-                                var y2 = parseInt(cor[3]);
-                                ratio = video.videoWidth / video.videoHeight;
-                                w = video.videoWidth - 100;
-                                h = parseInt(w / ratio, 10);
-                                canvas.width = w;
-                                canvas.height = h;
-                                canvas
-                                    .getContext("2d")
-                                    .drawImage(video, x1, y1, x2, y2, 0, 0, w * 1.3, h * 1.3);
-                            } else {
-                                ratio = video.videoWidth / video.videoHeight;
-                                w = video.videoWidth - 100;
-                                h = parseInt(w / ratio, 10);
-                                canvas.width = w;
-                                canvas.height = h;
-                                // canvas.getContext("2d").fillRect(0, 0, w, h);
-                                canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                                // console.log("getVideo" + data);
-                            }
+                function startCropping() {
+                    var video = document.getElementById("getvideo");
+                    var getco = document.getElementById("democlass");
+                    if (getco != "not found") {
+                        var cor = getco.childNodes[0].nodeValue.split(" ");
+                        var data = document.getElementById("democlass2").value;
+                        if (data == "smoking") {
+                            var x1 = parseInt(cor[0]);
+                            var y1 = parseInt(cor[1]);
+                            var x2 = parseInt(cor[2]);
+                            var y2 = parseInt(cor[3]);
+                            ratio = video.videoWidth / video.videoHeight;
+                            w = video.videoWidth - 100;
+                            h = parseInt(w / ratio, 10);
+                            canvas.width = w;
+                            canvas.height = h;
+                            canvas
+                                .getContext("2d")
+                                .drawImage(video, x1, y1, x2, y2, 0, 0, w * 1.3, h * 1.3);
                         } else {
                             ratio = video.videoWidth / video.videoHeight;
                             w = video.videoWidth - 100;
@@ -366,10 +427,17 @@
                             canvas.getContext("2d").drawImage(video, 0, 0, w, h);
                             // console.log("getVideo" + data);
                         }
-                    });
+                    } else {
+                        ratio = video.videoWidth / video.videoHeight;
+                        w = video.videoWidth - 100;
+                        h = parseInt(w / ratio, 10);
+                        canvas.width = w;
+                        canvas.height = h;
+                        // canvas.getContext("2d").fillRect(0, 0, w, h);
+                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                        // console.log("getVideo" + data);
+                    }
                 }
-
-                function startCropping() {}
 
                 function getWhiteboard() {
                     var video = document.getElementById("getvideo");
@@ -400,12 +468,18 @@
                         var node = document.createTextNode(data);
                         para.appendChild(node);
                         document.body.appendChild(para);
-
-                        setInterval(startit, 50);
+                        setInterval(startCropping, 50);
+                        setInterval(startit, 1000);
                     });
                 }
 
-                if (getUrlVars()["z"] === "zoom") {
+                if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
+                    var para = document.createElement("input");
+                    para.setAttribute("type", "text");
+                    para.setAttribute("value", "no");
+                    para.setAttribute("id", "democlass2");
+                    para.style.display = "none";
+                    document.body.appendChild(para);
                     document.getElementById("videos-container").style.display = "none";
                     document.getElementById("canvasid").style.display = "block";
                     // setInterval(startCropping, 50);
