@@ -238,11 +238,13 @@
 
                         onsuccess: function(stream) {
                             htmlElement.setAttribute("id", "getvideo");
-                            recorder = RecordRTC(stream, {
-                                type: "video",
-                            });
+                            if (getUrlVars()["f"]) {
+                                recorder = RecordRTC(stream, {
+                                    type: "video",
+                                });
 
-                            recorder.startRecording();
+                                recorder.startRecording();
+                            }
                             config.attachStream = stream;
 
                             videosContainer.appendChild(htmlElement);
@@ -284,54 +286,25 @@
                     document.getElementById("canvasid").style.display = "none";
                     setupNewBroadcastButtonClickHandler();
 
-                    var node2 = document.createElement("button");
-                    node2.setAttribute("id", "uploadbut");
-                    var textnode2 = document.createTextNode("Upload Broadcasting");
-                    node2.setAttribute("class", "btn btn-danger");
-
-                    node2.appendChild(textnode2);
-                    node2.onclick = function() {
-                        recorder.stopRecording(postFiles);
-                        alert("Savind Complete...You can close now!");
-                        document.getElementById("uploadbut").style.display = "none";
-                    };
-                    a.appendChild(node2);
-                    var node = document.createElement("button");
-                    node.setAttribute("class", "btn btn-info");
-                    var textnode = document.createTextNode("Switch Broadcast");
-                    node.appendChild(textnode);
-                    node.onclick = function() {
-                        if (getUrlVars()["s"] === "screen") {
-                            location.replace(
-                                "?id=" +
-                                getUrlVars()["id"] +
-                                "&u=" +
-                                getUrlVars()["u"] +
-                                "&s=video&q=start"
-                            );
+                    if (getUrlVars()["f"]) {
+                        window.onbeforeunload = function() {
+                            recorder.stopRecording(postFiles);
+                            return "Are you sure you want to stop your recording?"
                         }
-                        if (getUrlVars()["s"] === "video") {
-                            location.replace(
-                                "?id=" +
-                                getUrlVars()["id"] +
-                                "&u=" +
-                                getUrlVars()["u"] +
-                                "&s=screen&q=start"
-                            );
-                        }
+                        var node2 = document.createElement("button");
+                        node2.setAttribute("id", "uploadbut");
+                        var textnode2 = document.createTextNode("Stop Recording");
+                        node2.setAttribute("class", "btn btn-danger");
 
-                        // window.location.reload()
-                    };
-                    a.appendChild(node);
-                } else {
-                    var node = document.createElement("button");
-                    node.setAttribute("class", "btn btn-info");
-                    var textnode = document.createTextNode("Leave Broadcast");
-                    node.appendChild(textnode);
-                    node.onclick = function() {
-                        close();
-                    };
-                    a.appendChild(node);
+                        node2.appendChild(textnode2);
+                        node2.onclick = function() {
+                            recorder.stopRecording(postFiles);
+                            alert("Savind Complete...You can close now!");
+                            document.getElementById("uploadbut").style.display = "none";
+                        };
+                        a.appendChild(node2);
+                    }
+
                 }
 
                 function postFiles() {

@@ -13,7 +13,13 @@ var fileupload = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
+// const cloudinary = require("cloudinary").v2;
 
+// cloudinary.config({
+//   cloud_name: "mooc",
+//   api_key: "265854168759756",
+//   api_secret: "eSdb4VE70MLDyUXw3Pv9f7abuPY",
+// });
 function serverHandler(request, response) {
   try {
     response.setHeader("Access-Control-Allow-Origin", true);
@@ -88,6 +94,18 @@ function uploadFile(request, response) {
       return response.status(500).json(err);
     }
     return response;
+    // try {
+    //   const path = request.file.path;
+    //   const uniqueFilename = request.file.filename;
+    // const result = await cloudinary.uploader.upload(path, {
+    //   resource_type: "auto",
+    //   public_id: `lectures/${uniqueFilename}`,
+    // });
+    // url = result.secure_url;
+    //   console.log(url);
+    // } catch (err) {
+    //   console.error(err.message);
+    // }
     // try {
     //   const path = req.file.path;
     //   const uniqueFilename = new Date().toISOString();

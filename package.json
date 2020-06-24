@@ -12,6 +12,7 @@
     "author": "Ali Hassan",
     "license": "MIT",
     "dependencies": {
+        "cloudinary": "^1.22.0",
         "formidable": "latest",
         "mime": "latest",
         "multer": "^1.4.2",
