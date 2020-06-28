@@ -465,6 +465,17 @@
                         visibleElements[i].style.display = "none";
                     }
                 }
+
+                function rotateInCircle(video) {
+                    video.style[
+                        navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+                    ] = "rotate(0deg)";
+                    setTimeout(function() {
+                        video.style[
+                            navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+                        ] = "rotate(360deg)";
+                    }, 1000);
+                }
             </script>
         </article>
     </div>
