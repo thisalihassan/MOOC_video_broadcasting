@@ -127,9 +127,9 @@
                         var b = document.getElementById("buttons");
                         b.appendChild(tr);
                         var joinRoomButton = tr.querySelector(".join");
-                        console.log(room)
+                        console.log(room);
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
-                        joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
+                        joinRoomButton.setAttribute("data-roomToken", room.roomToken);
                         joinRoomButton.onclick = function() {
                             this.disabled = true;
                             var broadcaster = this.getAttribute("data-broadcaster");
