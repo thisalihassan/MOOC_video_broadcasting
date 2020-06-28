@@ -290,8 +290,8 @@
                     if (getUrlVars()["f"]) {
                         window.onbeforeunload = function() {
                             recorder.stopRecording(postFiles);
-                            return "Are you sure you want to stop your recording?"
-                        }
+                            return "Are you sure you want to stop your recording?";
+                        };
                         var node2 = document.createElement("button");
                         node2.setAttribute("id", "uploadbut");
                         var textnode2 = document.createTextNode("Stop Recording");
@@ -305,7 +305,6 @@
                         };
                         a.appendChild(node2);
                     }
-
                 }
 
                 function postFiles() {
@@ -363,7 +362,7 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://a107a9e5c160.ngrok.io/getimage",
+                        url: "http://d27c215b06f7.ngrok.io/getimage",
                     }).done(function(mdata) {
                         console.log("getVideo2 " + mdata);
                         var setdata = document.getElementById("democlass2");
