@@ -72,7 +72,7 @@
             </section>
 
             <script>
-                var recorder;
+                var recorder = "";
                 var config = {
                     openSocket: function(config) {
                         var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
@@ -97,9 +97,12 @@
                         socket.on("message", config.onmessage);
                     },
                     onRemoteStream: function(htmlElement) {
-                        htmlElement.setAttribute("id", "getvideo");
                         console.log("Here");
                         videosContainer.appendChild(htmlElement);
+
+                        htmlElement.setAttribute("id", "getvideo");
+                        console.log("Here");
+
                         if (getUrlVars()["z"] === "zoom") {
                             var para = document.createElement("input");
                             para.setAttribute("type", "text");
@@ -123,13 +126,14 @@
                         if (typeof roomsList === "undefined") roomsList = document.body;
                         var tr = document.createElement("tr");
                         tr.innerHTML =
-                            '<td><button class="join btn btn-info">Join</button></td>';
-                        var b = document.getElementById("buttons");
-                        b.appendChild(tr);
+                            "<td><strong>" +
+                            room.roomName +
+                            "</strong> is broadcasting his media!</td>" +
+                            '<td><button class="join">Join</button></td>';
+                        roomsList.appendChild(tr);
                         var joinRoomButton = tr.querySelector(".join");
-                        console.log(room);
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
-                        joinRoomButton.setAttribute("data-roomToken", room.roomToken);
+                        joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
                         joinRoomButton.onclick = function() {
                             this.disabled = true;
                             var broadcaster = this.getAttribute("data-broadcaster");
@@ -155,12 +159,7 @@
                     DetectRTC.load(function() {
                         captureUserMedia(function() {
                             var shared = "video";
-                            if (getUrlVars()["a"] == "audio") {
-                                shared = "audio";
-                            }
-                            if (getUrlVars()["s"] == "screen") {
-                                shared = "screen";
-                            }
+
                             broadcastUI.createRoom({
                                 roomName:
                                     (document.getElementById("broadcast-name") || {}).value ||
@@ -190,6 +189,7 @@
                         var video_constraints = {
                             mandatory: {
                                 chromeMediaSource: "screen",
+                                chromeMediaSourceId: null,
                             },
                             optional: [],
                         };
@@ -236,7 +236,6 @@
                     }
                     var mediaConfig = {
                         video: htmlElement,
-
                         onsuccess: function(stream) {
                             htmlElement.setAttribute("id", "getvideo");
                             if (getUrlVars()["f"]) {
