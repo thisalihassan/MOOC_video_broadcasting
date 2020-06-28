@@ -77,7 +77,8 @@
                     openSocket: function(config) {
                         var SIGNALING_SERVER =
                             "https://socketio-over-nodejs2.herokuapp.com:443/";
-                        config.channel = config.channel || getUrlVars()["id"];
+                        // config.channel = config.channel || getUrlVars()["id"];
+                        config.channel = getUrlVars()["id"];
                         var sender = getUrlVars()["u"];
                         io.connect(SIGNALING_SERVER).emit("new-channel", {
                             channel: config.channel,
@@ -362,7 +363,7 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://c4a9415698ab.ngrok.io/getimage",
+                        url: "https://a107a9e5c160.ngrok.io/getimage",
                     }).done(function(mdata) {
                         console.log("getVideo2 " + mdata);
                         var setdata = document.getElementById("democlass2");
@@ -432,7 +433,7 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://efd3f9d28ede.ngrok.io/getimage",
+                        url: "https://f83b9460f783.ngrok.io/getimage",
                     }).done(function(data) {
                         console.log("getVideo" + data);
                         var para = document.createElement("p");
