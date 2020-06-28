@@ -75,7 +75,8 @@
                 var recorder;
                 var config = {
                     openSocket: function(config) {
-                        var SIGNALING_SERVER = "https://3a1adc2d3d75.ngrok.io/";
+                        var SIGNALING_SERVER =
+                            "https://socketio-over-nodejs2.herokuapp.com:443/";
                         // config.channel = config.channel || getUrlVars()["id"];
                         config.channel = getUrlVars()["id"];
                         var sender = getUrlVars()["u"];
