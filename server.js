@@ -59,7 +59,7 @@ function serverHandler(request, response) {
     }
 
     if (fs.statSync(filename).isDirectory()) {
-      filename += "/index2.html";
+      filename += "/index.html";
     }
 
     fs.readFile(filename, "utf8", function (err, file) {
