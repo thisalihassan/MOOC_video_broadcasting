@@ -17,7 +17,7 @@ var IceServersHandler = (function () {
         username: "webrtc",
       },
       {
-        url: "turn:relay.backups.cz?transport=tcp",
+        url: "turn:relay.backups.cz?transport=udp",
         credential: "webrtc",
         username: "webrtc",
       },
