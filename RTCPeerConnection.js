@@ -82,7 +82,7 @@ var RTCPeerConnection = function (options) {
       }
     }
 
-    peer.onaddstream = function (event) {
+    peer.ontrack = function (event) {
       var remoteMediaStream = event.stream;
 
       // onRemoteStreamEnded(MediaStream)
