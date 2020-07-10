@@ -51,7 +51,7 @@ var RTCPeerConnection = function (options) {
     }
 
     var dontDuplicate = {};
-    peer.ontrack = function (event) {
+    peer.onaddstream = function (event) {
       var remoteMediaStream = event.streams[0];
 
       if (dontDuplicate[remoteMediaStream.id]) return;
@@ -310,15 +310,15 @@ var IceServersHandler = (function () {
       },
     ];
 
-    if (typeof window.InstallTrigger !== "undefined") {
-      iceServers = [
-        {
-          urls: ["turn:webrtcweb.com:7788", "stun:webrtcweb.com:7788"],
-          username: "muazkh",
-          credential: "muazkh",
-        },
-      ];
-    }
+    // if (typeof window.InstallTrigger !== "undefined") {
+    //   iceServers = [
+    //     {
+    //       urls: ["turn:webrtcweb.com:7788", "stun:webrtcweb.com:7788"],
+    //       username: "muazkh",
+    //       credential: "muazkh",
+    //     },
+    //   ];
+    // }
 
     return iceServers;
   }
