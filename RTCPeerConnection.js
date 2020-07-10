@@ -51,7 +51,7 @@ var RTCPeerConnection = function (options) {
     }
 
     var dontDuplicate = {};
-    peer.onaddstream = function (event) {
+    peer.ontrack = function (event) {
       var remoteMediaStream = event.streams[0];
 
       if (dontDuplicate[remoteMediaStream.id]) return;
@@ -82,7 +82,7 @@ var RTCPeerConnection = function (options) {
       }
     }
 
-    peer.ontrack = function (event) {
+    peer.onaddstream = function (event) {
       var remoteMediaStream = event.stream;
 
       // onRemoteStreamEnded(MediaStream)
