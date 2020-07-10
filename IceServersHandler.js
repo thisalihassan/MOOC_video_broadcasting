@@ -6,20 +6,20 @@ var IceServersHandler = (function () {
     // pions: 7575
     var iceServers = [
       {
-        urls: "stun:relay.backups.cz",
-        //   "stun:stun1.l.google.com:19302",
-        //   "stun:stun2.l.google.com:19302",
-        //   "stun:stun.l.google.com:19302?transport=udp",
+        urls: [
+          "stun:stun4.l.google.com:19302",
+          "stun:stun4.l.google.com:19302?transport=udp",
+        ],
       },
       {
-        url: "turn:relay.backups.cz",
-        credential: "webrtc",
-        username: "webrtc",
+        url: "turn:numb.viagenie.ca",
+        credential: "muazkh",
+        username: "webrtc@live.com",
       },
       {
-        url: "turn:relay.backups.cz?transport=udp",
-        credential: "webrtc",
-        username: "webrtc",
+        url: "turn:numb.viagenie.ca?transport=udp",
+        credential: "muazkh",
+        username: "webrtc@live.com",
       },
     ];
 
