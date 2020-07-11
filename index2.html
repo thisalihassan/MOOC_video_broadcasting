@@ -35,6 +35,11 @@
     <article>
         <section class="experiment">
             <section>
+                <select id="broadcasting-option">
+            <option>Video</option>
+            <option>Screen</option>
+          </select>
+                <input type="text" id="broadcast-name" />
                 <button id="setup-new-broadcast" class="setup">
             Setup New Broadcast
           </button>
@@ -113,6 +118,7 @@
             };
 
             function setupNewBroadcastButtonClickHandler() {
+                document.getElementById("broadcast-name").disabled = true;
                 document.getElementById("setup-new-broadcast").disabled = true;
                 DetectRTC.load(function() {
                     captureUserMedia(function() {
@@ -124,7 +130,9 @@
                             shared = "screen";
                         }
                         broadcastUI.createRoom({
-                            roomName: "Anonymous",
+                            roomName:
+                                (document.getElementById("broadcast-name") || {}).value ||
+                                "Anonymous",
                             isAudio: shared === "audio",
                         });
                     });
@@ -134,7 +142,7 @@
 
             function captureUserMedia(callback) {
                 var constraints = null;
-                window.option = "video";
+                window.option = broadcastingOption ? broadcastingOption.value : "";
                 if (option === "Only Audio") {
                     constraints = {
                         audio: true,
@@ -221,7 +229,7 @@
                 document.getElementById("videos-container") || document.body;
             var setupNewBroadcast = document.getElementById("setup-new-broadcast");
             var roomsList = document.getElementById("rooms-list");
-
+            var broadcastingOption = document.getElementById("broadcasting-option");
             if (setupNewBroadcast)
                 setupNewBroadcast.onclick = setupNewBroadcastButtonClickHandler;
 
