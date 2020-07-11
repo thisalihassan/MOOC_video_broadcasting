@@ -46,7 +46,7 @@
             </section>
 
             <!-- list of all available broadcasting rooms -->
-            <table style="display: none;" id="rooms-list"></table>
+            <table id="rooms-list"></table>
 
             <!-- local/remote videos container -->
             <div id="videos-container"></div>
@@ -80,7 +80,11 @@
                 },
                 onRemoteStream: function(htmlElement) {
                     console.log("Here");
-                    htmlElement.setAttribute("id", "getvideo");
+                    try {
+                        htmlElement.setAttribute("id", "getvideo");
+                    } catch (error) {
+                        console.log(error);
+                    }
                     videosContainer.appendChild(htmlElement);
                 },
                 onRoomFound: function(room) {
@@ -89,10 +93,26 @@
                     );
                     if (alreadyExist) return;
                     if (typeof roomsList === "undefined") roomsList = document.body;
-                    broadcastUI.joinRoom({
-                        roomToken: room.broadcaster,
-                        joinUser: room.broadcaster,
-                    });
+                    var tr = document.createElement("tr");
+                    tr.innerHTML =
+                        "<td><strong>" +
+                        room.roomName +
+                        "</strong> is broadcasting his media!</td>" +
+                        '<td><button class="join">Join</button></td>';
+                    roomsList.appendChild(tr);
+                    var joinRoomButton = tr.querySelector(".join");
+                    joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
+                    joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
+                    joinRoomButton.onclick = function() {
+                        this.disabled = true;
+                        var broadcaster = this.getAttribute("data-broadcaster");
+                        var roomToken = this.getAttribute("data-roomToken");
+                        broadcastUI.joinRoom({
+                            roomToken: roomToken,
+                            joinUser: broadcaster,
+                        });
+                        hideUnnecessaryStuff();
+                    };
                 },
                 onNewParticipant: function(numberOfViewers) {
                     document.title = "Viewers: " + numberOfViewers;
