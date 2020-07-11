@@ -60,7 +60,7 @@
                 openSocket: function(config) {
                     var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
                     config.channel = getUrlVars()["id"];
-                    var sender = Math.round(Math.random() * 999999999) + 999999999;
+                    var sender = getUrlVars()["id"];
                     io.connect(SIGNALING_SERVER).emit("new-channel", {
                         channel: config.channel,
                         sender: sender,
