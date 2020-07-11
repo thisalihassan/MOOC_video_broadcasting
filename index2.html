@@ -5,6 +5,18 @@
     <title>Video Broadcasting</title>
 
     <script>
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(
+                /[?&]+([^=&]+)=([^&]*)/gi,
+                function(m, key, value) {
+                    vars[key] = value;
+                }
+            );
+            return vars;
+        }
+    </script>
+    <script>
         document.createElement("article");
     </script>
 
@@ -17,30 +29,13 @@
     <script src="https://www.webrtc-experiment.com/CodecsHandler.js"></script>
     <script src="RTCPeerConnection.js"></script>
     <script src="https://www.webrtc-experiment.com/webrtc-broadcasting/broadcast.js"></script>
-    <script>
-        function getUrlVars() {
-            var vars = {};
-            var parts = window.location.href.replace(
-                /[?&]+([^=&]+)=([^&]*)/gi,
-                function(m, key, value) {
-                    vars[key] = value;
-                }
-            );
-            return vars;
-        }
-    </script>
 </head>
 
 <body>
     <article>
         <section class="experiment">
             <section>
-                <select style="display: none;" id="broadcasting-option">
-            <option>Video</option>
-            <option>Screen</option>
-          </select>
-                <input style="display: none;" type="text" id="broadcast-name" />
-                <button style="display: none;" id="setup-new-broadcast" class="setup">
+                <button id="setup-new-broadcast" class="setup">
             Setup New Broadcast
           </button>
             </section>
@@ -59,8 +54,8 @@
             var config = {
                 openSocket: function(config) {
                     var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
-                    config.channel = getUrlVars()["id"];
-                    var sender = getUrlVars()["u"];
+                    config.channel = config.channel = getUrlVars()["id"];
+                    var sender = Math.round(Math.random() * 999999999) + 999999999;
                     io.connect(SIGNALING_SERVER).emit("new-channel", {
                         channel: config.channel,
                         sender: sender,
@@ -79,13 +74,8 @@
                     socket.on("message", config.onmessage);
                 },
                 onRemoteStream: function(htmlElement) {
-                    console.log("Here");
-                    try {
-                        htmlElement.setAttribute("id", "getvideo");
-                    } catch (error) {
-                        console.log(error);
-                    }
                     videosContainer.appendChild(htmlElement);
+                    rotateInCircle(htmlElement);
                 },
                 onRoomFound: function(room) {
                     var alreadyExist = document.querySelector(
@@ -123,16 +113,18 @@
             };
 
             function setupNewBroadcastButtonClickHandler() {
-                document.getElementById("broadcast-name").disabled = true;
                 document.getElementById("setup-new-broadcast").disabled = true;
                 DetectRTC.load(function() {
                     captureUserMedia(function() {
                         var shared = "video";
-
+                        if (window.option == "Only Audio") {
+                            shared = "audio";
+                        }
+                        if (window.option == "Screen") {
+                            shared = "screen";
+                        }
                         broadcastUI.createRoom({
-                            roomName:
-                                (document.getElementById("broadcast-name") || {}).value ||
-                                "Anonymous",
+                            roomName: "Anonymous",
                             isAudio: shared === "audio",
                         });
                     });
@@ -143,8 +135,47 @@
             function captureUserMedia(callback) {
                 var constraints = null;
                 window.option = "video";
-
-                var htmlElement = document.createElement("video");
+                if (option === "Only Audio") {
+                    constraints = {
+                        audio: true,
+                        video: false,
+                    };
+                    if (DetectRTC.hasMicrophone !== true) {
+                        alert(
+                            "DetectRTC library is unable to find microphone; maybe you denied microphone access once and it is still denied or maybe microphone device is not attached to your system or another app is using same microphone."
+                        );
+                    }
+                }
+                if (option === "Screen") {
+                    var video_constraints = {
+                        mandatory: {
+                            chromeMediaSource: "screen",
+                            chromeMediaSourceId: null,
+                        },
+                        optional: [],
+                    };
+                    constraints = {
+                        audio: false,
+                        video: video_constraints,
+                    };
+                    if (DetectRTC.isScreenCapturingSupported !== true) {
+                        alert(
+                            'DetectRTC library is unable to find screen capturing support. You MUST run chrome with command line flag "chrome --enable-usermedia-screen-capturing"'
+                        );
+                    }
+                }
+                if (
+                    option != "Only Audio" &&
+                    option != "Screen" &&
+                    DetectRTC.hasWebcam !== true
+                ) {
+                    alert(
+                        "DetectRTC library is unable to find webcam; maybe you denied webcam access once and it is still denied or maybe webcam device is not attached to your system or another app is using same webcam."
+                    );
+                }
+                var htmlElement = document.createElement(
+                    option === "Only Audio" ? "audio" : "video"
+                );
                 htmlElement.muted = true;
                 htmlElement.volume = 0;
                 try {
@@ -152,10 +183,8 @@
                     htmlElement.setAttributeNode(
                         document.createAttribute("playsinline")
                     );
-                    htmlElement.setAttribute("id", "getvideo");
                     htmlElement.setAttributeNode(document.createAttribute("controls"));
                 } catch (e) {
-                    htmlElement.setAttribute("id", "getvideo");
                     htmlElement.setAttribute("autoplay", true);
                     htmlElement.setAttribute("playsinline", true);
                     htmlElement.setAttribute("controls", true);
@@ -166,11 +195,21 @@
                         config.attachStream = stream;
 
                         videosContainer.appendChild(htmlElement);
+                        rotateInCircle(htmlElement);
 
                         callback && callback();
                     },
                     onerror: function() {
-                        alert("unable to get access to your webcam");
+                        if (option === "Only Audio")
+                            alert("unable to get access to your microphone");
+                        else if (option === "Screen") {
+                            if (location.protocol === "http:")
+                                alert("Please test this WebRTC experiment on HTTPS.");
+                            else
+                                alert(
+                                    'Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?'
+                                );
+                        } else alert("unable to get access to your webcam");
                     },
                 };
                 if (constraints) mediaConfig.constraints = constraints;
@@ -182,10 +221,9 @@
                 document.getElementById("videos-container") || document.body;
             var setupNewBroadcast = document.getElementById("setup-new-broadcast");
             var roomsList = document.getElementById("rooms-list");
-            var broadcastingOption = document.getElementById("broadcasting-option");
-            if (getUrlVars()["q"] === "start") {
-                setupNewBroadcastButtonClickHandler();
-            }
+
+            if (setupNewBroadcast)
+                setupNewBroadcast.onclick = setupNewBroadcastButtonClickHandler;
 
             function hideUnnecessaryStuff() {
                 var visibleElements = document.getElementsByClassName("visible"),
