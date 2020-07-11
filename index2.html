@@ -5,12 +5,15 @@
     <title>Video Broadcasting</title>
 
     <script>
-        if (!location.hash.replace("#", "").length) {
-            location.href =
-                location.href.split("#")[0] +
-                "#" +
-                (Math.random() * 100).toString().replace(".", "");
-            location.reload();
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(
+                /[?&]+([^=&]+)=([^&]*)/gi,
+                function(m, key, value) {
+                    vars[key] = value;
+                }
+            );
+            return vars;
         }
     </script>
 
@@ -57,8 +60,9 @@
             var config = {
                 openSocket: function(config) {
                     var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
-                    config.channel =
-                        config.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, "");
+                    config.channel = config.channel || getUrlVars()["id"];
+                    console.log(getUrlVars()["id"]);
+                    console.log(config.channel);
                     var sender = Math.round(Math.random() * 999999999) + 999999999;
                     io.connect(SIGNALING_SERVER).emit("new-channel", {
                         channel: config.channel,
