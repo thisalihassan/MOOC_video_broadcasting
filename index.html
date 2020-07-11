@@ -96,10 +96,8 @@
                         socket.on("message", config.onmessage);
                     },
                     onRemoteStream: function(htmlElement) {
-                        console.log("Here");
                         videosContainer.appendChild(htmlElement);
 
-                        htmlElement.setAttribute("id", "getvideo");
                         console.log("Here");
 
                         if (getUrlVars()["z"] === "zoom") {
