@@ -94,7 +94,7 @@
                     var tr = document.createElement("tr");
                     tr.innerHTML =
                         "<td><strong>" +
-                        room.roomName +
+                        getUrlVars()["n"] +
                         "</strong> is broadcasting his media!</td>" +
                         '<td><button class="join">Join</button></td>';
                     roomsList.appendChild(tr);
