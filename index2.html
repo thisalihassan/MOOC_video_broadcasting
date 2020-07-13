@@ -133,9 +133,7 @@
                             shared = "screen";
                         }
                         broadcastUI.createRoom({
-                            roomName:
-                                (document.getElementById("broadcast-name") || {}).value ||
-                                "Anonymous",
+                            roomName: getUrlVars()["n"],
                             isAudio: shared === "audio",
                         });
                     });
