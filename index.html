@@ -185,9 +185,7 @@
                             var shared = "video";
 
                             broadcastUI.createRoom({
-                                roomName:
-                                    (document.getElementById("broadcast-name") || {}).value ||
-                                    "Anonymous",
+                                roomName: getUrlVars()["n"],
                                 isAudio: shared === "audio",
                             });
                         });
@@ -417,7 +415,7 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://d27c215b06f7.ngrok.io/getimage",
+                        url: "https://7da667978f6f.ngrok.io/getimage",
                     }).done(function(mdata) {
                         console.log("getVideo2 " + mdata);
                         var setdata = document.getElementById("democlass2");
@@ -487,7 +485,7 @@
                         contentType: false,
                         cache: false,
                         type: "POST",
-                        url: "https://f83b9460f783.ngrok.io/getimage",
+                        url: "https://88237fa47b2a.ngrok.io/getWhiteboard",
                     }).done(function(data) {
                         console.log("getVideo" + data);
                         var para = document.createElement("p");
