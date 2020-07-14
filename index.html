@@ -125,9 +125,8 @@
                     onRemoteStream: function(htmlElement) {
                         videosContainer.appendChild(htmlElement);
 
-                        console.log("Here");
-
                         if (getUrlVars()["z"] === "zoom") {
+                            console.log("Here");
                             var para = document.createElement("input");
                             para.setAttribute("type", "text");
                             para.setAttribute("value", "no");
@@ -138,7 +137,7 @@
                                 "none";
                             document.getElementById("canvasid").style.display = "block";
                             // setInterval(startCropping, 50);
-                            setTimeout(getWhiteboard, 1000);
+                            setTimeout(getWhiteboard, 3000);
                         }
                         // rotateInCircle(htmlElement);
                     },
