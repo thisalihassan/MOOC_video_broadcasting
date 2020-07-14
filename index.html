@@ -128,15 +128,9 @@
 
                         if (getUrlVars()["z"] === "zoom") {
                             console.log("Here");
-                            var para = document.createElement("input");
-                            para.setAttribute("type", "text");
-                            para.setAttribute("value", "no");
-                            para.setAttribute("id", "democlass2");
-                            para.style.display = "none";
-                            document.body.appendChild(para);
 
                             // setInterval(startCropping, 50);
-                            setTimeout(getWhiteboard, 1500);
+                            setTimeout(getWhiteboard, 2500);
                         }
                         // rotateInCircle(htmlElement);
                     },
@@ -433,7 +427,7 @@
                             var y1 = parseInt(cor[1]);
                             var x2 = parseInt(cor[2]);
                             var y2 = parseInt(cor[3]);
-                            console.log(x1, y1, x2, y1, w, h)
+                            console.log(x1, y1, x2, y1, w, h);
                             ratio = video.videoWidth / video.videoHeight;
                             w = video.videoWidth - 100;
                             h = parseInt(w / ratio, 10);
@@ -509,13 +503,13 @@
                     getWhiteboard();
                 };
                 document.body.appendChild(node3);
+                var para = document.createElement("input");
+                para.setAttribute("type", "text");
+                para.setAttribute("value", "no");
+                para.setAttribute("id", "democlass2");
+                para.style.display = "none";
+                document.body.appendChild(para);
                 if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
-                    var para = document.createElement("input");
-                    para.setAttribute("type", "text");
-                    para.setAttribute("value", "no");
-                    para.setAttribute("id", "democlass2");
-                    para.style.display = "none";
-                    document.body.appendChild(para);
                     document.getElementById("videos-container").style.display = "none";
                     document.getElementById("canvasid").style.display = "block";
                     // setInterval(startCropping, 50);
