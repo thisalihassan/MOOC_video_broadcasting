@@ -468,34 +468,35 @@
                     var video = document.getElementById("getvideo");
                     var canvas = document.getElementById("canvas");
                     if (!video) {
-                        getWhiteboard();
+                        setTimeout(getWhiteboard, 500);
+                    } else {
+                        ratio = video.videoWidth / video.videoHeight;
+                        w = video.videoWidth - 100;
+                        h = parseInt(w / ratio, 10);
+                        canvas.width = w;
+                        canvas.height = h;
+                        // canvas.getContext("2d").fillRect(0, 0, w, h);
+                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                        var imgURL = canvas.toDataURL("image/png");
+                        $.ajax({
+                            data: imgURL,
+                            processData: false,
+                            contentType: false,
+                            cache: false,
+                            type: "POST",
+                            url: "https://88237fa47b2a.ngrok.io/getWhiteboard",
+                        }).done(function(data) {
+                            console.log("getVideo" + data);
+                            var para = document.createElement("p");
+                            para.setAttribute("id", "democlass");
+                            para.style.display = "none";
+                            var node = document.createTextNode(data);
+                            para.appendChild(node);
+                            document.body.appendChild(para);
+                            setInterval(startCropping, 50);
+                            setInterval(startit, 1000);
+                        });
                     }
-                    ratio = video.videoWidth / video.videoHeight;
-                    w = video.videoWidth - 100;
-                    h = parseInt(w / ratio, 10);
-                    canvas.width = w;
-                    canvas.height = h;
-                    // canvas.getContext("2d").fillRect(0, 0, w, h);
-                    canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                    var imgURL = canvas.toDataURL("image/png");
-                    $.ajax({
-                        data: imgURL,
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                        type: "POST",
-                        url: "https://88237fa47b2a.ngrok.io/getWhiteboard",
-                    }).done(function(data) {
-                        console.log("getVideo" + data);
-                        var para = document.createElement("p");
-                        para.setAttribute("id", "democlass");
-                        para.style.display = "none";
-                        var node = document.createTextNode(data);
-                        para.appendChild(node);
-                        document.body.appendChild(para);
-                        setInterval(startCropping, 50);
-                        setInterval(startit, 1000);
-                    });
                 }
 
                 if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
