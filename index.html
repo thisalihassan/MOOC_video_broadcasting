@@ -423,7 +423,10 @@
                 function startCropping() {
                     var video = document.getElementById("getvideo");
                     var getco = document.getElementById("democlass");
-                    if (getco != "not found" || getco != "error") {
+                    if (
+                        getco != "not found" ||
+                        getco.childNodes[0].nodeValue != "error"
+                    ) {
                         var cor = getco.childNodes[0].nodeValue.split(" ");
                         var data = document.getElementById("democlass2").value;
                         if (data == "waving hands" || data == "applauding") {
