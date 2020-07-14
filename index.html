@@ -419,7 +419,7 @@
                 function startCropping() {
                     var video = document.getElementById("getvideo");
                     var getco = document.getElementById("democlass");
-                    if (getco != "not found") {
+                    if (getco != "not found" || getco != "error") {
                         var cor = getco.childNodes[0].nodeValue.split(" ");
                         var data = document.getElementById("democlass2").value;
                         if (data == "waving hands" || data == "applauding") {
@@ -427,6 +427,7 @@
                             var y1 = parseInt(cor[1]);
                             var x2 = parseInt(cor[2]);
                             var y2 = parseInt(cor[3]);
+
                             console.log(x1, y1, x2, y1, w, h);
                             ratio = video.videoWidth / video.videoHeight;
                             w = video.videoWidth - 100;
@@ -454,7 +455,7 @@
                         canvas.height = h;
                         // canvas.getContext("2d").fillRect(0, 0, w, h);
                         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                        // console.log("getVideo" + data);
+                        getWhiteboard();
                     }
                 }
 
@@ -485,6 +486,7 @@
                             url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
                         }).done(function(data) {
                             console.log("getVideo coordinates: " + data);
+
                             var para = document.createElement("p");
                             para.setAttribute("id", "democlass");
                             para.style.display = "none";
