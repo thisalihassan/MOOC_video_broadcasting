@@ -400,19 +400,23 @@
                 function startit() {
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
-
-                    $.ajax({
-                        data: imgURL,
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                        type: "POST",
-                        url: "https://741b1cec2c12.ngrok.io/getimage",
-                    }).done(function(mdata) {
-                        console.log("getVideo2 " + mdata);
-                        var setdata = document.getElementById("democlass2");
-                        setdata.setAttribute("value", mdata);
-                    });
+                    var getco = document.getElementById("democlass");
+                    if (getco != "error") {
+                        $.ajax({
+                            data: imgURL,
+                            processData: false,
+                            contentType: false,
+                            cache: false,
+                            type: "POST",
+                            url: "https://741b1cec2c12.ngrok.io/getimage",
+                        }).done(function(mdata) {
+                            console.log("getVideo2 " + mdata);
+                            var setdata = document.getElementById("democlass2");
+                            setdata.setAttribute("value", mdata);
+                        });
+                    } else {
+                        getWhiteboard();
+                    }
                     console.log(document.getElementById("democlass2").value);
                 }
 
@@ -455,7 +459,6 @@
                         canvas.height = h;
                         // canvas.getContext("2d").fillRect(0, 0, w, h);
                         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                        getWhiteboard();
                     }
                 }
 
