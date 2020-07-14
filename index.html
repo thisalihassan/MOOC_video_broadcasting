@@ -401,6 +401,7 @@
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
                     var getco = document.getElementById("democlass");
+                    print(getco);
                     if (getco.childNodes[0].nodeValue != "error") {
                         $.ajax({
                             data: imgURL,
