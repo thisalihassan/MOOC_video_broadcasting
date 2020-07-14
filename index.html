@@ -445,7 +445,7 @@
                                 console.log("getVideo coordinates: " + data);
 
                                 var para = document.getElementById("democlass");
-                                para.childNodes[0].nodeValue(data);
+                                para.childNodes[0].nodeValue = data;
                             });
                         }
                     }
@@ -523,13 +523,19 @@
                             url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
                         }).done(function(data) {
                             console.log("getVideo coordinates: " + data);
+                            var find = document.getElementById("democlass");
+                            if (para != null) {
+                                var para = document.getElementById("democlass");
+                                para.childNodes[0].nodeValue = data;
+                            } else {
+                                var para = document.createElement("p");
+                                para.setAttribute("id", "democlass");
+                                para.style.display = "none";
+                                var node = document.createTextNode(data);
+                                para.appendChild(node);
+                                document.body.appendChild(para);
+                            }
 
-                            var para = document.createElement("p");
-                            para.setAttribute("id", "democlass");
-                            para.style.display = "none";
-                            var node = document.createTextNode(data);
-                            para.appendChild(node);
-                            document.body.appendChild(para);
                             setInterval(startCropping, 100);
                             setInterval(startit, 2000);
                         });
