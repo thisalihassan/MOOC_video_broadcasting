@@ -401,8 +401,8 @@
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
                     var getco = document.getElementById("democlass");
-                    console.log(getco);
-                    if (getco.childNodes[0].nodeValue != "error") {
+                    console.log(getco.childNodes[0].nodeValue);
+                    if (!getco.childNodes[0].nodeValue.includes("error")) {
                         $.ajax({
                             data: imgURL,
                             processData: false,
@@ -424,9 +424,8 @@
                 function startCropping() {
                     var video = document.getElementById("getvideo");
                     var getco = document.getElementById("democlass");
-                    if (
-                        getco != "not found" ||
-                        getco.childNodes[0].nodeValue != "error"
+                    if (!getco.childNodes[0].nodeValue.includes("not found") ||
+                        !getco.childNodes[0].nodeValue.includes("error")
                     ) {
                         var cor = getco.childNodes[0].nodeValue.split(" ");
                         var data = document.getElementById("democlass2").value;
