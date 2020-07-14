@@ -400,9 +400,9 @@
                 function startit() {
                     var canvas = document.getElementById("canvas");
                     var imgURL = canvas.toDataURL("image/png");
-                    var getco = document.getElementById("democlass");
-                    console.log(getco.childNodes[0].nodeValue);
-                    if (!getco.childNodes[0].nodeValue.includes("error")) {
+                    var getco = document.getElementById("democlass").value;
+                    console.log(getco);
+                    if (getco != "error" || getco != "not found") {
                         $.ajax({
                             data: imgURL,
                             processData: false,
@@ -411,7 +411,7 @@
                             type: "POST",
                             url: "https://741b1cec2c12.ngrok.io/getimage",
                         }).done(function(mdata) {
-                            console.log("getVideo2 " + mdata);
+                            console.log("get action: " + mdata);
                             var setdata = document.getElementById("democlass2");
                             setdata.setAttribute("value", mdata);
                         });
@@ -421,44 +421,35 @@
                         document.getElementById("canvasid").style.display = "block";
                         var video = document.getElementById("getvideo");
                         var canvas = document.getElementById("canvas");
-                        console.log("but yhn tak tu arha hai ALi");
-                        if (!video) {
-                            setTimeout(getWhiteboard, 500);
-                        } else {
-                            console.log("yhn ana chahiye");
-                            ratio = video.videoWidth / video.videoHeight;
-                            w = video.videoWidth - 100;
-                            h = parseInt(w / ratio, 10);
-                            canvas.width = w;
-                            canvas.height = h;
-                            // canvas.getContext("2d").fillRect(0, 0, w, h);
-                            canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                            var imgURL = canvas.toDataURL("image/png");
-                            $.ajax({
-                                data: imgURL,
-                                processData: false,
-                                contentType: false,
-                                cache: false,
-                                type: "POST",
-                                url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
-                            }).done(function(data) {
-                                console.log("getVideo coordinates: " + data);
 
-                                var para = document.getElementById("democlass");
-                                para.childNodes[0].nodeValue = data;
-                            });
-                        }
+                        ratio = video.videoWidth / video.videoHeight;
+                        w = video.videoWidth - 100;
+                        h = parseInt(w / ratio, 10);
+                        canvas.width = w;
+                        canvas.height = h;
+                        // canvas.getContext("2d").fillRect(0, 0, w, h);
+                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                        var imgURL = canvas.toDataURL("image/png");
+                        $.ajax({
+                            data: imgURL,
+                            processData: false,
+                            contentType: false,
+                            cache: false,
+                            type: "POST",
+                            url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
+                        }).done(function(data) {
+                            console.log("getVideo coordinates recalled: " + data);
+                            document.getElementById("democlass").value = data;
+                        });
                     }
                     console.log(document.getElementById("democlass2").value);
                 }
 
                 function startCropping() {
                     var video = document.getElementById("getvideo");
-                    var getco = document.getElementById("democlass");
-                    if (!getco.childNodes[0].nodeValue.includes("not found") ||
-                        !getco.childNodes[0].nodeValue.includes("error")
-                    ) {
-                        var cor = getco.childNodes[0].nodeValue.split(" ");
+                    var getco = document.getElementById("democlass").value;
+                    if (getco != "not found" || getco != "error") {
+                        var cor = getco.split(" ");
                         var data = document.getElementById("democlass2").value;
                         if (data == "waving hands" || data == "applauding") {
                             var x1 = parseInt(cor[0]);
@@ -528,12 +519,18 @@
                                 var para = document.getElementById("democlass");
                                 para.childNodes[0].nodeValue = data;
                             } else {
-                                var para = document.createElement("p");
+                                var para = document.createElement("input");
+                                para.setAttribute("type", "text");
+                                para.setAttribute("value", data);
                                 para.setAttribute("id", "democlass");
                                 para.style.display = "none";
-                                var node = document.createTextNode(data);
-                                para.appendChild(node);
                                 document.body.appendChild(para);
+                                // var para = document.createElement("p");
+                                // para.setAttribute("id", "democlass");
+                                // para.style.display = "none";
+                                // var node = document.createTextNode(data);
+                                // para.appendChild(node);
+                                // document.body.appendChild(para);
                             }
 
                             setInterval(startCropping, 100);
@@ -541,19 +538,21 @@
                         });
                     }
                 }
-                var node3 = document.createElement("button");
-                node3.setAttribute("class", "btn btn-primary");
-                node3.innerHTML = "Recalibrate Whiteboard";
-                node3.onclick = function() {
-                    getWhiteboard();
-                };
-                document.body.appendChild(node3);
-                var para = document.createElement("input");
-                para.setAttribute("type", "text");
-                para.setAttribute("value", "no");
-                para.setAttribute("id", "democlass2");
-                para.style.display = "none";
-                document.body.appendChild(para);
+                if (getUrlVars()["z"]) {
+                    var node3 = document.createElement("button");
+                    node3.setAttribute("class", "btn btn-primary");
+                    node3.innerHTML = "Recalibrate Whiteboard";
+                    node3.onclick = function() {
+                        getWhiteboard();
+                    };
+                    document.body.appendChild(node3);
+                    var para = document.createElement("input");
+                    para.setAttribute("type", "text");
+                    para.setAttribute("value", "no");
+                    para.setAttribute("id", "democlass2");
+                    para.style.display = "none";
+                    document.body.appendChild(para);
+                }
                 if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
                     document.getElementById("videos-container").style.display = "none";
                     document.getElementById("canvasid").style.display = "block";
