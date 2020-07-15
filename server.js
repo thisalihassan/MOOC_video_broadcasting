@@ -111,7 +111,14 @@ function uploadFile(request, response) {
       var room = splitname[0];
       console.log(room + "room");
       const body = JSON.stringify({ url, room });
-      const config = { headers: { "Content-Type": "application/json" } };
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://moocback.herokuapp.com/",
+          "Access-Control-Allow-Headers":
+            "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization",
+        },
+      };
 
       axios.post(
         "https://moocback.herokuapp.com/api/Courses/uploadStream",
