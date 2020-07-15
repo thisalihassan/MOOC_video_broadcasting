@@ -141,10 +141,11 @@
                         if (alreadyExist) return;
                         if (typeof roomsList === "undefined") roomsList = document.body;
                         var tr = document.createElement("tr");
+                        var rooname = getUrlVars()["n"].split("%20").join(" ");
                         tr.setAttribute("id", "roomjoined");
                         tr.innerHTML =
                             "<td>Click to join Room" +
-                            getUrlVars()["n"].replace("%20", " ") +
+                            rooname +
                             "</td>" +
                             '<td><button class="btn btn-info join">Join</button></td>';
                         roomsList.appendChild(tr);
