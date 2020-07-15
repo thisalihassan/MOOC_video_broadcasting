@@ -144,10 +144,10 @@
                         var rooname = getUrlVars()["n"].split("%20").join(" ");
                         tr.setAttribute("id", "roomjoined");
                         tr.innerHTML =
-                            "<td>Click to join Room " +
+                            "<td> <h3>Click to join Room : " +
                             rooname +
-                            "</td>" +
-                            '<td><button class="pl-3 btn btn-info join">Join</button></td>';
+                            " </h3> </h3>    </h3> </td>" +
+                            '<td> <button class="btn btn-info join">Join</button></td>';
                         roomsList.appendChild(tr);
                         var joinRoomButton = tr.querySelector(".join");
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
