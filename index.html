@@ -144,10 +144,10 @@
                         var rooname = getUrlVars()["n"].split("%20").join(" ");
                         tr.setAttribute("id", "roomjoined");
                         tr.innerHTML =
-                            "<td>Click to join Room" +
+                            "<td>Click to join Room " +
                             rooname +
                             "</td>" +
-                            '<td><button class="btn btn-info join">Join</button></td>';
+                            '<td><button class="pl-3 btn btn-info join">Join</button></td>';
                         roomsList.appendChild(tr);
                         var joinRoomButton = tr.querySelector(".join");
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
@@ -161,7 +161,7 @@
                                 joinUser: broadcaster,
                             });
                             document.getElementById("roomjoined").innerHTML =
-                                "Please wait while are fetching the stream!!";
+                                "<h3>Please wait while we are fetching the stream!!</h3>";
                             hideUnnecessaryStuff();
                         };
                     },
