@@ -416,33 +416,36 @@
                             setdata.setAttribute("value", mdata);
                         });
                     } else {
-                        document.getElementById("videos-container").style.display =
-                            "none";
-                        document.getElementById("canvasid").style.display = "block";
-                        var video = document.getElementById("getvideo");
-                        var canvas = document.getElementById("canvas");
-
-                        ratio = video.videoWidth / video.videoHeight;
-                        w = video.videoWidth - 100;
-                        h = parseInt(w / ratio, 10);
-                        canvas.width = w;
-                        canvas.height = h;
-                        // canvas.getContext("2d").fillRect(0, 0, w, h);
-                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                        var imgURL = canvas.toDataURL("image/png");
-                        $.ajax({
-                            data: imgURL,
-                            processData: false,
-                            contentType: false,
-                            cache: false,
-                            type: "POST",
-                            url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
-                        }).done(function(data) {
-                            console.log("getVideo coordinates recalled: " + data);
-                            document.getElementById("democlass").value = data;
-                        });
+                        RecalibrateBoard();
                     }
-                    console.log(document.getElementById("democlass2").value);
+                    console.log(document.getElementById("democlass").value);
+                }
+
+                function RecalibrateBoard() {
+                    document.getElementById("videos-container").style.display = "none";
+                    document.getElementById("canvasid").style.display = "block";
+                    var video = document.getElementById("getvideo");
+                    var canvas = document.getElementById("canvas");
+
+                    ratio = video.videoWidth / video.videoHeight;
+                    w = video.videoWidth - 100;
+                    h = parseInt(w / ratio, 10);
+                    canvas.width = w;
+                    canvas.height = h;
+                    // canvas.getContext("2d").fillRect(0, 0, w, h);
+                    canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                    var imgURL = canvas.toDataURL("image/png");
+                    $.ajax({
+                        data: imgURL,
+                        processData: false,
+                        contentType: false,
+                        cache: false,
+                        type: "POST",
+                        url: "https://9abb3137ae90.ngrok.io/getWhiteboard",
+                    }).done(function(data) {
+                        console.log("getVideo coordinates recalled: " + data);
+                        document.getElementById("democlass").value = data;
+                    });
                 }
 
                 function startCropping() {
@@ -547,7 +550,7 @@
                     node3.setAttribute("class", "btn btn-primary");
                     node3.innerHTML = "Recalibrate Whiteboard";
                     node3.onclick = function() {
-                        getWhiteboard();
+                        RecalibrateBoard();
                     };
                     document.body.appendChild(node3);
                     var para = document.createElement("input");
