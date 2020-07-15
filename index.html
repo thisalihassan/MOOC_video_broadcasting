@@ -546,13 +546,14 @@
                     }
                 }
                 if (getUrlVars()["z"]) {
+                    var a = document.getElementById("buttons");
                     var node3 = document.createElement("button");
                     node3.setAttribute("class", "btn btn-primary");
                     node3.innerHTML = "Recalibrate Whiteboard";
                     node3.onclick = function() {
                         RecalibrateBoard();
                     };
-                    document.body.appendChild(node3);
+                    a.appendChild(node3);
                     var para = document.createElement("input");
                     para.setAttribute("type", "text");
                     para.setAttribute("value", "no");
