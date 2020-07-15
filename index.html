@@ -448,7 +448,7 @@
                     if (getco != "not found" || getco != "error") {
                         var cor = getco.split(" ");
                         var data = document.getElementById("democlass2").value;
-                        if (data == "writing on a board") {
+                        if (data.includes("writing") || data == "writing on a board") {
                             var x1 = parseInt(cor[0]);
                             var y1 = parseInt(cor[1]);
                             var x2 = parseInt(cor[2]);
