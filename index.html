@@ -313,7 +313,9 @@
 
                         node2.onclick = function() {
                             recorder.stopRecording(postFiles);
-                            alert("Savind Complete...You can close now!");
+                            alert(
+                                "Saving Complete. You can close now. It will be uploaded in your lecture files soon..don't worry!"
+                            );
                             document.getElementById("uploadbut").style.display = "none";
                             var node3 = document.createElement("button");
                             node3.setAttribute("class", "btn btn-danger");
