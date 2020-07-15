@@ -101,7 +101,7 @@ function uploadFile(request, response) {
       const path = request.file.path;
 
       var splitname = request.file.filename.split("(+)");
-      const uniqueFilename = new Date().toISOString();
+      const uniqueFilename = new Date().toISOString() + splitname[0];
       const result = await cloudinary.uploader.upload(path, {
         resource_type: "auto",
         public_id: `lectures/${uniqueFilename}`,
