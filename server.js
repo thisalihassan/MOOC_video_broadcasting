@@ -100,7 +100,7 @@ function uploadFile(request, response) {
     try {
       const path = request.file.path;
       console.log(request.file.filename);
-      var splitname = request.file.filename.split("(+)");
+      var splitname = request.file.filename.split(".webm");
       const uniqueFilename = new Date().toISOString();
       const result = await cloudinary.uploader.upload(path, {
         resource_type: "auto",
@@ -120,7 +120,7 @@ function uploadFile(request, response) {
         },
       };
 
-      axios.post(
+      await axios.post(
         "https://moocback.herokuapp.com/api/Courses/uploadStream",
         body,
         config
