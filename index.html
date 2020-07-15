@@ -360,7 +360,7 @@
                     var blob = recorder.getBlob();
 
                     // getting unique identifier for the file name
-                    var name = getUrlVars()["f"] + ".webm";
+                    var name = getUrlVars()["id"] + "*" + getUrlVars()["f"] + ".webm";
                     console.log(name);
                     var file = new File([blob], name, {
                         type: "video/webm",

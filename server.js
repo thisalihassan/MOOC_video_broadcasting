@@ -1,5 +1,5 @@
 var port = process.env.PORT || 8001;
-
+var axios = require("axios");
 var server = require("http"),
   url = require("url"),
   path = require("path"),
@@ -13,13 +13,13 @@ var fileupload = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-// const cloudinary = require("cloudinary").v2;
+const cloudinary = require("cloudinary").v2;
 
-// cloudinary.config({
-//   cloud_name: "mooc",
-//   api_key: "265854168759756",
-//   api_secret: "eSdb4VE70MLDyUXw3Pv9f7abuPY",
-// });
+cloudinary.config({
+  cloud_name: "mooc",
+  api_key: "265854168759756",
+  api_secret: "eSdb4VE70MLDyUXw3Pv9f7abuPY",
+});
 function serverHandler(request, response) {
   try {
     response.setHeader("Access-Control-Allow-Origin", true);
@@ -93,19 +93,27 @@ function uploadFile(request, response) {
     } else if (err) {
       return response.status(500).json(err);
     }
-    return response;
-    // try {
-    //   const path = request.file.path;
-    //   const uniqueFilename = request.file.filename;
-    // const result = await cloudinary.uploader.upload(path, {
-    //   resource_type: "auto",
-    //   public_id: `lectures/${uniqueFilename}`,
-    // });
-    // url = result.secure_url;
-    //   console.log(url);
-    // } catch (err) {
-    //   console.error(err.message);
-    // }
+
+    try {
+      const path = request.file.path;
+      var splitname = request.file.filename.split("*");
+      const uniqueFilename = splitname[1];
+      const result = await cloudinary.uploader.upload(path, {
+        resource_type: "auto",
+        public_id: `lectures/${uniqueFilename}`,
+      });
+      var url = result.secure_url;
+      var room = splitname[0];
+      var filename = splitname[1].split[0];
+      const body = JSON.stringify({ url, room, filename });
+      const config = { headers: { "Content-Type": "application/json" } };
+
+      axios.post("http://localhost:5000/api/Courses/makefile", body, config);
+      console.log(url);
+      return url;
+    } catch (err) {
+      console.error(err.message);
+    }
     // try {
     //   const path = req.file.path;
     //   const uniqueFilename = new Date().toISOString();
