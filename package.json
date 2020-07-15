@@ -2,9 +2,9 @@
     "name": "reacthaha",
     "version": "1.0.0",
     "description": "Hello React",
-    "main": "server.js",
+    "main": "server2.js",
     "scripts": {
-        "start": "node server"
+        "start": "node server2"
     },
     "routes": {
         "cors": true
