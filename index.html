@@ -67,528 +67,533 @@
                 <div class="row">
                     <div class="col-md-4, col-lg-4, col-sm-4"></div>
                     <div id="buttons" class="col-sm-4, col-md-4, col-lg-4, col-xs-4">
-                        <div id="spinner" class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status">
-                            <span class="sr-only">Loading...</span
-                ><span> Don't quit the page</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                        <div id="spinner">
+                            <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <span>
+                  Don't quit the page wait while we upload your video</span
+                >
+              </div>
+            </div>
+          </div>
+        </section>
 
-            <script>
-                document.getElementById("spinner").style.display = "none";
+        <script>
+          document.getElementById("spinner").style.display = "none";
 
-                function xhrRoomClose(url, data, data2) {
-                    var request = new XMLHttpRequest();
-                    request.onreadystatechange = function() {
-                        if (request.readyState == 4 && request.status == 200) {}
-                    };
+          function xhrRoomClose(url, data, data2) {
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+              if (request.readyState == 4 && request.status == 200) {
+              }
+            };
 
-                    request.open("POST", url);
+            request.open("POST", url);
 
-                    request.setRequestHeader(
-                        "Content-Type",
-                        "application/json;charset=UTF-8"
-                    );
-                    request.send(
-                        JSON.stringify({
-                            id: data,
-                            user: data2,
-                        })
-                    );
-                }
-                window.onbeforeunload = function() {
-                    xhrRoomClose(
-                        "https://moocback.herokuapp.com/getModal",
-                        getUrlVars()["id"],
-                        getUrlVars()["u"]
-                    );
-                    return "Are you sure you want to stop your recording?";
-                };
-                var recorder = "";
-                var config = {
-                    openSocket: function(config) {
-                        var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
-                        // config.channel = config.channel || getUrlVars()["id"];
-                        config.channel = config.channel || getUrlVars()["id"];
-                        var sender = getUrlVars()["u"];
-                        io.connect(SIGNALING_SERVER).emit("new-channel", {
-                            channel: config.channel,
-                            sender: sender,
-                        });
-                        var socket = io.connect(SIGNALING_SERVER + config.channel);
-                        socket.channel = config.channel;
-                        socket.on("connect", function() {
-                            if (config.callback) config.callback(socket);
-                        });
-                        socket.send = function(message) {
-                            socket.emit("message", {
-                                sender: sender,
-                                data: message,
-                            });
-                        };
-                        socket.on("message", config.onmessage);
-                    },
-                    onRemoteStream: function(htmlElement) {
-                        htmlElement.setAttribute("id", "getvideo");
-                        videosContainer.appendChild(htmlElement);
-                        document.getElementById("roomjoined").style.display = "none";
-                        if (getUrlVars()["z"] === "zoom") {
-                            console.log("Here");
+            request.setRequestHeader(
+              "Content-Type",
+              "application/json;charset=UTF-8"
+            );
+            request.send(
+              JSON.stringify({
+                id: data,
+                user: data2,
+              })
+            );
+          }
+          window.onbeforeunload = function () {
+            xhrRoomClose(
+              "https://moocback.herokuapp.com/getModal",
+              getUrlVars()["id"],
+              getUrlVars()["u"]
+            );
+            return "Are you sure you want to stop your recording?";
+          };
+          var recorder = "";
+          var config = {
+            openSocket: function (config) {
+              var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
+              // config.channel = config.channel || getUrlVars()["id"];
+              config.channel = config.channel || getUrlVars()["id"];
+              var sender = getUrlVars()["u"];
+              io.connect(SIGNALING_SERVER).emit("new-channel", {
+                channel: config.channel,
+                sender: sender,
+              });
+              var socket = io.connect(SIGNALING_SERVER + config.channel);
+              socket.channel = config.channel;
+              socket.on("connect", function () {
+                if (config.callback) config.callback(socket);
+              });
+              socket.send = function (message) {
+                socket.emit("message", {
+                  sender: sender,
+                  data: message,
+                });
+              };
+              socket.on("message", config.onmessage);
+            },
+            onRemoteStream: function (htmlElement) {
+              htmlElement.setAttribute("id", "getvideo");
+              videosContainer.appendChild(htmlElement);
+              document.getElementById("roomjoined").style.display = "none";
+              if (getUrlVars()["z"] === "zoom") {
+                console.log("Here");
 
-                            // setInterval(startCropping, 50);
-                            setTimeout(getWhiteboard, 2500);
-                        }
-                        // rotateInCircle(htmlElement);
-                    },
-                    onRoomFound: function(room) {
-                        var alreadyExist = document.querySelector(
-                            'button[data-broadcaster="' + room.broadcaster + '"]'
-                        );
-                        if (alreadyExist) return;
-                        if (typeof roomsList === "undefined") roomsList = document.body;
-                        var tr = document.createElement("tr");
-                        var rooname = getUrlVars()["n"].split("%20").join(" ");
-                        tr.setAttribute("id", "roomjoined");
-                        tr.innerHTML =
-                            "<td> <h3>Click to join Room : " +
-                            rooname +
-                            " </h3> </h3>    </h3> </td>" +
-                            '<td> <button class="btn btn-info join">Join</button></td>';
-                        roomsList.appendChild(tr);
-                        var joinRoomButton = tr.querySelector(".join");
-                        joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
-                        joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
-                        joinRoomButton.onclick = function() {
-                            this.disabled = true;
-                            var broadcaster = this.getAttribute("data-broadcaster");
-                            var roomToken = this.getAttribute("data-roomToken");
-                            broadcastUI.joinRoom({
-                                roomToken: roomToken,
-                                joinUser: broadcaster,
-                            });
-                            document.getElementById("roomjoined").innerHTML =
-                                "<h3>Please wait while we are fetching the stream!!</h3>";
-                            hideUnnecessaryStuff();
-                        };
-                    },
-                    onNewParticipant: function(numberOfViewers) {
-                        document.title = "Viewers: " + numberOfViewers;
-                    },
-                    onReady: function() {
-                        console.log("now you can open or join rooms");
-                    },
-                };
+                // setInterval(startCropping, 50);
+                setTimeout(getWhiteboard, 2500);
+              }
+              // rotateInCircle(htmlElement);
+            },
+            onRoomFound: function (room) {
+              var alreadyExist = document.querySelector(
+                'button[data-broadcaster="' + room.broadcaster + '"]'
+              );
+              if (alreadyExist) return;
+              if (typeof roomsList === "undefined") roomsList = document.body;
+              var tr = document.createElement("tr");
+              var rooname = getUrlVars()["n"].split("%20").join(" ");
+              tr.setAttribute("id", "roomjoined");
+              tr.innerHTML =
+                "<td> <h3>Click to join Room : " +
+                rooname +
+                " </h3> </h3>    </h3> </td>" +
+                '<td> <button class="btn btn-info join">Join</button></td>';
+              roomsList.appendChild(tr);
+              var joinRoomButton = tr.querySelector(".join");
+              joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
+              joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
+              joinRoomButton.onclick = function () {
+                this.disabled = true;
+                var broadcaster = this.getAttribute("data-broadcaster");
+                var roomToken = this.getAttribute("data-roomToken");
+                broadcastUI.joinRoom({
+                  roomToken: roomToken,
+                  joinUser: broadcaster,
+                });
+                document.getElementById("roomjoined").innerHTML =
+                  "<h3>Please wait while we are fetching the stream!!</h3>";
+                hideUnnecessaryStuff();
+              };
+            },
+            onNewParticipant: function (numberOfViewers) {
+              document.title = "Viewers: " + numberOfViewers;
+            },
+            onReady: function () {
+              console.log("now you can open or join rooms");
+            },
+          };
 
-                function setupNewBroadcastButtonClickHandler() {
-                    document.getElementById("broadcast-name").disabled = true;
-                    document.getElementById("setup-new-broadcast").disabled = true;
-                    DetectRTC.load(function() {
-                        captureUserMedia(function() {
-                            var shared = "video";
+          function setupNewBroadcastButtonClickHandler() {
+            document.getElementById("broadcast-name").disabled = true;
+            document.getElementById("setup-new-broadcast").disabled = true;
+            DetectRTC.load(function () {
+              captureUserMedia(function () {
+                var shared = "video";
 
-                            broadcastUI.createRoom({
-                                roomName: getUrlVars()["n"],
-                                isAudio: shared === "audio",
-                            });
-                        });
-                        hideUnnecessaryStuff();
-                    });
-                }
+                broadcastUI.createRoom({
+                  roomName: getUrlVars()["n"],
+                  isAudio: shared === "audio",
+                });
+              });
+              hideUnnecessaryStuff();
+            });
+          }
 
-                function captureUserMedia(callback) {
-                    var constraints = null;
-                    window.option = broadcastingOption ? broadcastingOption.value : "";
-                    if (getUrlVars()["a"] === "audio") {
-                        constraints = {
-                            audio: true,
-                            video: false,
-                        };
-                        if (DetectRTC.hasMicrophone !== true) {
-                            alert(
-                                "DetectRTC library is unable to find microphone; maybe you denied microphone access once and it is still denied or maybe microphone device is not attached to your system or another app is using same microphone."
-                            );
-                        }
-                    }
-                    if (getUrlVars()["s"] === "screen") {
-                        var video_constraints = {
-                            mandatory: {
-                                chromeMediaSource: "screen",
-                                chromeMediaSourceId: null,
-                            },
-                            optional: [],
-                        };
-                        constraints = {
-                            audio: false,
-                            video: video_constraints,
-                        };
-                        if (DetectRTC.isScreenCapturingSupported !== true) {
-                            alert(
-                                'DetectRTC library is unable to find screen capturing support. You MUST run chrome with command line flag "chrome --enable-usermedia-screen-capturing"'
-                            );
-                        }
-                    }
-                    if (
-                        getUrlVars()["a"] != "audio" &&
-                        getUrlVars()["s"] != "screen" &&
-                        DetectRTC.hasWebcam !== true
-                    ) {
-                        alert(
-                            "DetectRTC library is unable to find webcam; maybe you denied webcam access once and it is still denied or maybe webcam device is not attached to your system or another app is using same webcam."
-                        );
-                    }
-                    var htmlElement = document.createElement(
-                        option === "Only Audio" ? "audio" : "video"
-                    );
-                    htmlElement.muted = true;
-                    htmlElement.volume = 0;
-                    try {
-                        htmlElement.setAttributeNode(
-                            document.createAttribute("autoplay")
-                        );
-                        htmlElement.setAttributeNode(
-                            document.createAttribute("playsinline")
-                        );
-                        htmlElement.setAttributeNode(
-                            document.createAttribute("controls")
-                        );
-                        htmlElement.setAttribute("id", "getvideo");
-                    } catch (e) {
-                        htmlElement.setAttribute("autoplay", true);
-                        htmlElement.setAttribute("playsinline", true);
-                        htmlElement.setAttribute("controls", true);
-                        htmlElement.setAttribute("id", "getvideo");
-                    }
-                    var mediaConfig = {
-                        video: htmlElement,
-                        onsuccess: function(stream) {
-                            htmlElement.setAttribute("id", "getvideo");
-                            if (getUrlVars()["f"]) {
-                                recorder = RecordRTC(stream, {
-                                    type: "video",
-                                });
-
-                                recorder.startRecording();
-                            }
-                            config.attachStream = stream;
-
-                            videosContainer.appendChild(htmlElement);
-                            // rotateInCircle(htmlElement);
-
-                            callback && callback();
-                        },
-                        onerror: function() {
-                            if (option === "Only Audio")
-                                alert("unable to get access to your microphone");
-                            else if (option === "Screen") {
-                                if (location.protocol === "http:")
-                                    alert("Please test this WebRTC experiment on HTTPS.");
-                                else
-                                    alert(
-                                        'Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?'
-                                    );
-                            } else alert("unable to get access to your webcam");
-                        },
-                    };
-                    if (constraints) mediaConfig.constraints = constraints;
-                    getUserMedia(mediaConfig);
-                }
-
-                var broadcastUI = broadcast(config);
-                /* UI specific */
-                var videosContainer =
-                    document.getElementById("videos-container") || document.body;
-                var setupNewBroadcast = document.getElementById(
-                    "setup-new-broadcast"
+          function captureUserMedia(callback) {
+            var constraints = null;
+            window.option = broadcastingOption ? broadcastingOption.value : "";
+            if (getUrlVars()["a"] === "audio") {
+              constraints = {
+                audio: true,
+                video: false,
+              };
+              if (DetectRTC.hasMicrophone !== true) {
+                alert(
+                  "DetectRTC library is unable to find microphone; maybe you denied microphone access once and it is still denied or maybe microphone device is not attached to your system or another app is using same microphone."
                 );
-                var roomsList = document.getElementById("rooms-list");
-                var broadcastingOption = document.getElementById(
-                    "broadcasting-option"
+              }
+            }
+            if (getUrlVars()["s"] === "screen") {
+              var video_constraints = {
+                mandatory: {
+                  chromeMediaSource: "screen",
+                  chromeMediaSourceId: null,
+                },
+                optional: [],
+              };
+              constraints = {
+                audio: false,
+                video: video_constraints,
+              };
+              if (DetectRTC.isScreenCapturingSupported !== true) {
+                alert(
+                  'DetectRTC library is unable to find screen capturing support. You MUST run chrome with command line flag "chrome --enable-usermedia-screen-capturing"'
                 );
-                var a = document.getElementById("buttons");
-                document.getElementById("canvasid").style.display = "none";
-                if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
-                    document.getElementById("videos-container").style.display = "block";
-                    document.getElementById("canvasid").style.display = "none";
-                    setupNewBroadcastButtonClickHandler();
+              }
+            }
+            if (
+              getUrlVars()["a"] != "audio" &&
+              getUrlVars()["s"] != "screen" &&
+              DetectRTC.hasWebcam !== true
+            ) {
+              alert(
+                "DetectRTC library is unable to find webcam; maybe you denied webcam access once and it is still denied or maybe webcam device is not attached to your system or another app is using same webcam."
+              );
+            }
+            var htmlElement = document.createElement(
+              option === "Only Audio" ? "audio" : "video"
+            );
+            htmlElement.muted = true;
+            htmlElement.volume = 0;
+            try {
+              htmlElement.setAttributeNode(
+                document.createAttribute("autoplay")
+              );
+              htmlElement.setAttributeNode(
+                document.createAttribute("playsinline")
+              );
+              htmlElement.setAttributeNode(
+                document.createAttribute("controls")
+              );
+              htmlElement.setAttribute("id", "getvideo");
+            } catch (e) {
+              htmlElement.setAttribute("autoplay", true);
+              htmlElement.setAttribute("playsinline", true);
+              htmlElement.setAttribute("controls", true);
+              htmlElement.setAttribute("id", "getvideo");
+            }
+            var mediaConfig = {
+              video: htmlElement,
+              onsuccess: function (stream) {
+                htmlElement.setAttribute("id", "getvideo");
+                if (getUrlVars()["f"]) {
+                  recorder = RecordRTC(stream, {
+                    type: "video",
+                  });
 
-                    if (getUrlVars()["f"]) {
-                        var node2 = document.createElement("button");
-                        node2.setAttribute("id", "uploadbut");
-                        node2.setAttribute("class", "btn btn-danger");
-                        node2.innerHTML = "Stop Recording";
-
-                        node2.onclick = function() {
-                            recorder.stopRecording(postFiles);
-                            alert(
-                                "Uploading in progress. Please wait we will let you know when it is done!!"
-                            );
-                            document.getElementById("uploadbut").style.display = "none";
-                            var node3 = document.createElement("button");
-                            node3.setAttribute("class", "btn btn-danger");
-                            node3.innerHTML = "Stop Broadcasting";
-                            node3.onclick = function() {
-                                xhrRoomClose(
-                                    "https://moocback.herokuapp.com/getModal",
-                                    getUrlVars()["id"],
-                                    getUrlVars()["u"]
-                                );
-                            };
-                            a.appendChild(node3);
-                        };
-                        a.appendChild(node2);
-                    } else {
-                        var node3 = document.createElement("button");
-                        node3.setAttribute("class", "btn btn-danger");
-                        node3.innerHTML = "Stop Broadcasting";
-                        node3.onclick = function() {
-                            xhrRoomClose(
-                                "https://moocback.herokuapp.com/getModal",
-                                getUrlVars()["id"],
-                                getUrlVars()["u"]
-                            );
-                        };
-                        a.appendChild(node3);
-                    }
+                  recorder.startRecording();
                 }
-                if (getUrlVars()["q"] === "join") {
-                    var node3 = document.createElement("button");
-                    node3.setAttribute("class", "btn btn-danger");
-                    node3.innerHTML = "Leave Broadcasting";
-                    node3.onclick = function() {
-                        xhrRoomClose(
-                            "https://moocback.herokuapp.com/getModal",
-                            getUrlVars()["id"],
-                            getUrlVars()["u"]
-                        );
-                    };
-                    a.appendChild(node3);
+                config.attachStream = stream;
+
+                videosContainer.appendChild(htmlElement);
+                // rotateInCircle(htmlElement);
+
+                callback && callback();
+              },
+              onerror: function () {
+                if (option === "Only Audio")
+                  alert("unable to get access to your microphone");
+                else if (option === "Screen") {
+                  if (location.protocol === "http:")
+                    alert("Please test this WebRTC experiment on HTTPS.");
+                  else
+                    alert(
+                      'Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?'
+                    );
+                } else alert("unable to get access to your webcam");
+              },
+            };
+            if (constraints) mediaConfig.constraints = constraints;
+            getUserMedia(mediaConfig);
+          }
+
+          var broadcastUI = broadcast(config);
+          /* UI specific */
+          var videosContainer =
+            document.getElementById("videos-container") || document.body;
+          var setupNewBroadcast = document.getElementById(
+            "setup-new-broadcast"
+          );
+          var roomsList = document.getElementById("rooms-list");
+          var broadcastingOption = document.getElementById(
+            "broadcasting-option"
+          );
+          var a = document.getElementById("buttons");
+          document.getElementById("canvasid").style.display = "none";
+          if (getUrlVars()["q"] === "start" && getUrlVars()["s"]) {
+            document.getElementById("videos-container").style.display = "block";
+            document.getElementById("canvasid").style.display = "none";
+            setupNewBroadcastButtonClickHandler();
+
+            if (getUrlVars()["f"]) {
+              var node2 = document.createElement("button");
+              node2.setAttribute("id", "uploadbut");
+              node2.setAttribute("class", "btn btn-danger");
+              node2.innerHTML = "Stop Recording";
+
+              node2.onclick = function () {
+                recorder.stopRecording(postFiles);
+                broadcastUI = null;
+                alert(
+                  "Uploading in progress. Please wait we will let you know when it is done!!"
+                );
+                document.getElementById("uploadbut").style.display = "none";
+                var node3 = document.createElement("button");
+                node3.setAttribute("class", "btn btn-danger");
+                node3.innerHTML = "Stop Broadcasting";
+                node3.onclick = function () {
+                  xhrRoomClose(
+                    "https://moocback.herokuapp.com/getModal",
+                    getUrlVars()["id"],
+                    getUrlVars()["u"]
+                  );
+                };
+                a.appendChild(node3);
+              };
+              a.appendChild(node2);
+            } else {
+              var node3 = document.createElement("button");
+              node3.setAttribute("class", "btn btn-danger");
+              node3.innerHTML = "Stop Broadcasting";
+              node3.onclick = function () {
+                xhrRoomClose(
+                  "https://moocback.herokuapp.com/getModal",
+                  getUrlVars()["id"],
+                  getUrlVars()["u"]
+                );
+              };
+              a.appendChild(node3);
+            }
+          }
+          if (getUrlVars()["q"] === "join") {
+            var node3 = document.createElement("button");
+            node3.setAttribute("class", "btn btn-danger");
+            node3.innerHTML = "Leave Broadcasting";
+            node3.onclick = function () {
+              xhrRoomClose(
+                "https://moocback.herokuapp.com/getModal",
+                getUrlVars()["id"],
+                getUrlVars()["u"]
+              );
+            };
+            a.appendChild(node3);
+          }
+
+          function postFiles() {
+            document.getElementById("spinner").style.display = "block";
+            var blob = recorder.getBlob();
+
+            // getting unique identifier for the file name
+            var name = getUrlVars()["id"] + ".webm";
+
+            var file = new File([blob], name, {
+              type: "video/webm",
+            });
+            var videoElement = document.createElement("video");
+            videoElement.src = "";
+
+            xhr("/uploadFile", file, function (responseText) {
+              document.getElementById("spinner").style.display = "none";
+              alert("Recording upload complete");
+            });
+          }
+
+          function xhr(url, data, callback) {
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+              console.log(request.readyState);
+              if (request.readyState == 4 && request.status == 200) {
+                callback(request);
+              }
+            };
+
+            request.open("POST", url);
+
+            var formData = new FormData();
+            formData.append("file", data);
+            request.send(formData);
+          }
+
+          function startit() {
+            var canvas = document.getElementById("canvas");
+            var imgURL = canvas.toDataURL("image/png");
+            var getco = document.getElementById("democlass").value;
+            console.log(getco);
+            if (getco != "error" || getco != "not found") {
+              $.ajax({
+                data: imgURL,
+                processData: false,
+                contentType: false,
+                cache: false,
+                type: "POST",
+                url: "https://a726ead6cc5b.ngrok.io/getimage",
+              }).done(function (mdata) {
+                console.log("get action: " + mdata);
+                var setdata = document.getElementById("democlass2");
+                setdata.setAttribute("value", mdata);
+              });
+            } else {
+              RecalibrateBoard();
+            }
+            console.log(document.getElementById("democlass").value);
+          }
+
+          function RecalibrateBoard() {
+            document.getElementById("videos-container").style.display = "none";
+            document.getElementById("canvasid").style.display = "block";
+            var video = document.getElementById("getvideo");
+            var canvas = document.getElementById("canvas");
+
+            ratio = video.videoWidth / video.videoHeight;
+            w = video.videoWidth - 100;
+            h = parseInt(w / ratio, 10);
+            canvas.width = w;
+            canvas.height = h;
+            // canvas.getContext("2d").fillRect(0, 0, w, h);
+            canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+            var imgURL = canvas.toDataURL("image/png");
+            $.ajax({
+              data: imgURL,
+              processData: false,
+              contentType: false,
+              cache: false,
+              type: "POST",
+              url: "https://1fd74828ee99.ngrok.io/getWhiteboard",
+            }).done(function (data) {
+              console.log("getVideo coordinates recalled: " + data);
+              document.getElementById("democlass").value = data;
+            });
+          }
+
+          function startCropping() {
+            var video = document.getElementById("getvideo");
+            var getco = document.getElementById("democlass").value;
+            if (getco != "not found" || getco != "error") {
+              var cor = getco.split(" ");
+              var data = document.getElementById("democlass2").value;
+              if (data.includes("writing") || data == "writing on a board") {
+                var x1 = parseInt(cor[0]);
+                var y1 = parseInt(cor[1]);
+                var x2 = parseInt(cor[2]);
+                var y2 = parseInt(cor[3]);
+                if (x1 || y1 || x2) {
+                  console.log(x1, y1, x2, y1, w, h);
+                  ratio = video.videoWidth / video.videoHeight;
+                  w = video.videoWidth - 100;
+                  h = parseInt(w / ratio, 10);
+                  canvas.width = w;
+                  canvas.height = h;
+                  canvas
+                    .getContext("2d")
+                    .drawImage(video, x1, y1, x2, y2, 0, 0, w * 1.3, h * 1.3);
+                }
+              } else {
+                ratio = video.videoWidth / video.videoHeight;
+                w = video.videoWidth - 100;
+                h = parseInt(w / ratio, 10);
+                canvas.width = w;
+                canvas.height = h;
+                // canvas.getContext("2d").fillRect(0, 0, w, h);
+                canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+                // console.log("getVideo" + data);
+              }
+            } else {
+              ratio = video.videoWidth / video.videoHeight;
+              w = video.videoWidth - 100;
+              h = parseInt(w / ratio, 10);
+              canvas.width = w;
+              canvas.height = h;
+              // canvas.getContext("2d").fillRect(0, 0, w, h);
+              canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+            }
+          }
+
+          function getWhiteboard() {
+            document.getElementById("videos-container").style.display = "none";
+            document.getElementById("canvasid").style.display = "block";
+            var video = document.getElementById("getvideo");
+            var canvas = document.getElementById("canvas");
+            console.log("but yhn tak tu arha hai ALi");
+            if (!video) {
+              setTimeout(getWhiteboard, 500);
+            } else {
+              console.log("yhn ana chahiye");
+              ratio = video.videoWidth / video.videoHeight;
+              w = video.videoWidth - 100;
+              h = parseInt(w / ratio, 10);
+              canvas.width = w;
+              canvas.height = h;
+              // canvas.getContext("2d").fillRect(0, 0, w, h);
+              canvas.getContext("2d").drawImage(video, 0, 0, w, h);
+              var imgURL = canvas.toDataURL("image/png");
+              $.ajax({
+                data: imgURL,
+                processData: false,
+                contentType: false,
+                cache: false,
+                type: "POST",
+                url: "https://1fd74828ee99.ngrok.io/getWhiteboard",
+              }).done(function (data) {
+                console.log("getVideo coordinates: " + data);
+                var find = document.getElementById("democlass");
+                if (para != null) {
+                  var para = document.getElementById("democlass");
+                  para.childNodes[0].nodeValue = data;
+                } else {
+                  var para = document.createElement("input");
+                  para.setAttribute("type", "text");
+                  para.setAttribute("value", data);
+                  para.setAttribute("id", "democlass");
+                  para.style.display = "none";
+                  document.body.appendChild(para);
+                  // var para = document.createElement("p");
+                  // para.setAttribute("id", "democlass");
+                  // para.style.display = "none";
+                  // var node = document.createTextNode(data);
+                  // para.appendChild(node);
+                  // document.body.appendChild(para);
                 }
 
-                function postFiles() {
-                    document.getElementById("spinner").style.display = "block";
-                    var blob = recorder.getBlob();
+                setInterval(startCropping, 100);
+                setInterval(startit, 1700);
+              });
+            }
+          }
+          if (getUrlVars()["z"]) {
+            // var a = document.getElementById("buttons");
+            // var node3 = document.createElement("button");
+            // node3.setAttribute("class", "btn btn-primary");
+            // node3.innerHTML = "Recalibrate Whiteboard";
+            // node3.onclick = function() {
+            //     RecalibrateBoard();
+            // };
+            // a.appendChild(node3);
+            var para = document.createElement("input");
+            para.setAttribute("type", "text");
+            para.setAttribute("value", "no");
+            para.setAttribute("id", "democlass2");
+            para.style.display = "none";
+            document.body.appendChild(para);
+          }
+          if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
+            document.getElementById("videos-container").style.display = "none";
+            document.getElementById("canvasid").style.display = "block";
+            // setInterval(startCropping, 50);
+            setTimeout(getWhiteboard, 3000);
+          }
 
-                    // getting unique identifier for the file name
-                    var name = getUrlVars()["id"] + ".webm";
+          function hideUnnecessaryStuff() {
+            var visibleElements = document.getElementsByClassName("visible"),
+              length = visibleElements.length;
+            for (var i = 0; i < length; i++) {
+              visibleElements[i].style.display = "none";
+            }
+          }
 
-                    var file = new File([blob], name, {
-                        type: "video/webm",
-                    });
-                    var videoElement = document.createElement("video");
-                    videoElement.src = "";
-
-                    xhr("/uploadFile", file, function(responseText) {
-                        document.getElementById("spinner").style.display = "none";
-                        alert("Recording upload complete");
-                    });
-                }
-
-                function xhr(url, data, callback) {
-                    var request = new XMLHttpRequest();
-                    request.onreadystatechange = function() {
-                        console.log(request.readyState);
-                        if (request.readyState == 4 && request.status == 200) {
-                            callback(request);
-                        }
-                    };
-
-                    request.open("POST", url);
-
-                    var formData = new FormData();
-                    formData.append("file", data);
-                    request.send(formData);
-                }
-
-                function startit() {
-                    var canvas = document.getElementById("canvas");
-                    var imgURL = canvas.toDataURL("image/png");
-                    var getco = document.getElementById("democlass").value;
-                    console.log(getco);
-                    if (getco != "error" || getco != "not found") {
-                        $.ajax({
-                            data: imgURL,
-                            processData: false,
-                            contentType: false,
-                            cache: false,
-                            type: "POST",
-                            url: "https://a726ead6cc5b.ngrok.io/getimage",
-                        }).done(function(mdata) {
-                            console.log("get action: " + mdata);
-                            var setdata = document.getElementById("democlass2");
-                            setdata.setAttribute("value", mdata);
-                        });
-                    } else {
-                        RecalibrateBoard();
-                    }
-                    console.log(document.getElementById("democlass").value);
-                }
-
-                function RecalibrateBoard() {
-                    document.getElementById("videos-container").style.display = "none";
-                    document.getElementById("canvasid").style.display = "block";
-                    var video = document.getElementById("getvideo");
-                    var canvas = document.getElementById("canvas");
-
-                    ratio = video.videoWidth / video.videoHeight;
-                    w = video.videoWidth - 100;
-                    h = parseInt(w / ratio, 10);
-                    canvas.width = w;
-                    canvas.height = h;
-                    // canvas.getContext("2d").fillRect(0, 0, w, h);
-                    canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                    var imgURL = canvas.toDataURL("image/png");
-                    $.ajax({
-                        data: imgURL,
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                        type: "POST",
-                        url: "https://1fd74828ee99.ngrok.io/getWhiteboard",
-                    }).done(function(data) {
-                        console.log("getVideo coordinates recalled: " + data);
-                        document.getElementById("democlass").value = data;
-                    });
-                }
-
-                function startCropping() {
-                    var video = document.getElementById("getvideo");
-                    var getco = document.getElementById("democlass").value;
-                    if (getco != "not found" || getco != "error") {
-                        var cor = getco.split(" ");
-                        var data = document.getElementById("democlass2").value;
-                        if (data.includes("writing") || data == "writing on a board") {
-                            var x1 = parseInt(cor[0]);
-                            var y1 = parseInt(cor[1]);
-                            var x2 = parseInt(cor[2]);
-                            var y2 = parseInt(cor[3]);
-                            if (x1 || y1 || x2) {
-                                console.log(x1, y1, x2, y1, w, h);
-                                ratio = video.videoWidth / video.videoHeight;
-                                w = video.videoWidth - 100;
-                                h = parseInt(w / ratio, 10);
-                                canvas.width = w;
-                                canvas.height = h;
-                                canvas
-                                    .getContext("2d")
-                                    .drawImage(video, x1, y1, x2, y2, 0, 0, w * 1.3, h * 1.3);
-                            }
-                        } else {
-                            ratio = video.videoWidth / video.videoHeight;
-                            w = video.videoWidth - 100;
-                            h = parseInt(w / ratio, 10);
-                            canvas.width = w;
-                            canvas.height = h;
-                            // canvas.getContext("2d").fillRect(0, 0, w, h);
-                            canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                            // console.log("getVideo" + data);
-                        }
-                    } else {
-                        ratio = video.videoWidth / video.videoHeight;
-                        w = video.videoWidth - 100;
-                        h = parseInt(w / ratio, 10);
-                        canvas.width = w;
-                        canvas.height = h;
-                        // canvas.getContext("2d").fillRect(0, 0, w, h);
-                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                    }
-                }
-
-                function getWhiteboard() {
-                    document.getElementById("videos-container").style.display = "none";
-                    document.getElementById("canvasid").style.display = "block";
-                    var video = document.getElementById("getvideo");
-                    var canvas = document.getElementById("canvas");
-                    console.log("but yhn tak tu arha hai ALi");
-                    if (!video) {
-                        setTimeout(getWhiteboard, 500);
-                    } else {
-                        console.log("yhn ana chahiye");
-                        ratio = video.videoWidth / video.videoHeight;
-                        w = video.videoWidth - 100;
-                        h = parseInt(w / ratio, 10);
-                        canvas.width = w;
-                        canvas.height = h;
-                        // canvas.getContext("2d").fillRect(0, 0, w, h);
-                        canvas.getContext("2d").drawImage(video, 0, 0, w, h);
-                        var imgURL = canvas.toDataURL("image/png");
-                        $.ajax({
-                            data: imgURL,
-                            processData: false,
-                            contentType: false,
-                            cache: false,
-                            type: "POST",
-                            url: "https://1fd74828ee99.ngrok.io/getWhiteboard",
-                        }).done(function(data) {
-                            console.log("getVideo coordinates: " + data);
-                            var find = document.getElementById("democlass");
-                            if (para != null) {
-                                var para = document.getElementById("democlass");
-                                para.childNodes[0].nodeValue = data;
-                            } else {
-                                var para = document.createElement("input");
-                                para.setAttribute("type", "text");
-                                para.setAttribute("value", data);
-                                para.setAttribute("id", "democlass");
-                                para.style.display = "none";
-                                document.body.appendChild(para);
-                                // var para = document.createElement("p");
-                                // para.setAttribute("id", "democlass");
-                                // para.style.display = "none";
-                                // var node = document.createTextNode(data);
-                                // para.appendChild(node);
-                                // document.body.appendChild(para);
-                            }
-
-                            setInterval(startCropping, 100);
-                            setInterval(startit, 1700);
-                        });
-                    }
-                }
-                if (getUrlVars()["z"]) {
-                    // var a = document.getElementById("buttons");
-                    // var node3 = document.createElement("button");
-                    // node3.setAttribute("class", "btn btn-primary");
-                    // node3.innerHTML = "Recalibrate Whiteboard";
-                    // node3.onclick = function() {
-                    //     RecalibrateBoard();
-                    // };
-                    // a.appendChild(node3);
-                    var para = document.createElement("input");
-                    para.setAttribute("type", "text");
-                    para.setAttribute("value", "no");
-                    para.setAttribute("id", "democlass2");
-                    para.style.display = "none";
-                    document.body.appendChild(para);
-                }
-                if (getUrlVars()["z"] === "zoom" && getUrlVars()["q"] === "start") {
-                    document.getElementById("videos-container").style.display = "none";
-                    document.getElementById("canvasid").style.display = "block";
-                    // setInterval(startCropping, 50);
-                    setTimeout(getWhiteboard, 3000);
-                }
-
-                function hideUnnecessaryStuff() {
-                    var visibleElements = document.getElementsByClassName("visible"),
-                        length = visibleElements.length;
-                    for (var i = 0; i < length; i++) {
-                        visibleElements[i].style.display = "none";
-                    }
-                }
-
-                function rotateInCircle(video) {
-                    video.style[
-                        navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
-                    ] = "rotate(0deg)";
-                    setTimeout(function() {
-                        video.style[
-                            navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
-                        ] = "rotate(360deg)";
-                    }, 1000);
-                }
-            </script>
-        </article>
+          function rotateInCircle(video) {
+            video.style[
+              navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+            ] = "rotate(0deg)";
+            setTimeout(function () {
+              video.style[
+                navigator.mozGetUserMedia ? "transform" : "-webkit-transform"
+              ] = "rotate(360deg)";
+            }, 1000);
+          }
+        </script>
+      </article>
     </div>
-</body>
-
+  </body>
 </html>
