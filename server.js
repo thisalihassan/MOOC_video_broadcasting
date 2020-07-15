@@ -101,7 +101,7 @@ function uploadFile(request, response) {
       const path = request.file.path;
       console.log(request.file.filename + "file");
       var splitname = request.file.filename.split("(+)");
-      const uniqueFilename = splitname[1].split(".")[0].split("%20").join("");
+      const uniqueFilename = request.file.filename;
       const result = await cloudinary.uploader.upload(path, {
         resource_type: "auto",
         public_id: `lectures/${uniqueFilename}`,
@@ -110,9 +110,7 @@ function uploadFile(request, response) {
       var url = result.secure_url;
       var room = splitname[0];
       console.log(room + "room");
-      var filename = uniqueFilename.split("%20").join(" ");
-      console.log(filename + "filename");
-      const body = JSON.stringify({ url, room, filename });
+      const body = JSON.stringify({ url, room });
       const config = { headers: { "Content-Type": "application/json" } };
 
       axios.post(
