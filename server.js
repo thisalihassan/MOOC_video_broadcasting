@@ -116,7 +116,7 @@ function uploadFile(request, response) {
       const config = { headers: { "Content-Type": "application/json" } };
 
       axios.post(
-        "http://localhost:5000/api/Courses/uploadStream",
+        "https://moocback.herokuapp.com/api/Courses/uploadStream",
         body,
         config
       );
