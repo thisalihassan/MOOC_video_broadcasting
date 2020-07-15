@@ -99,14 +99,14 @@ function uploadFile(request, response) {
 
     try {
       const path = request.file.path;
-
+      console.log(request.file.filename);
       var splitname = request.file.filename.split("(+)");
       const uniqueFilename = new Date().toISOString() + splitname[0];
       const result = await cloudinary.uploader.upload(path, {
         resource_type: "auto",
         public_id: `lectures/${uniqueFilename}`,
       });
-
+      console.log(result);
       var url = result.secure_url;
       var room = splitname[0];
       console.log(room + "room");
