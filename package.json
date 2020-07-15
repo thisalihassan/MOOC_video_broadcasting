@@ -2,9 +2,9 @@
     "name": "reacthaha",
     "version": "1.0.0",
     "description": "Hello React",
-    "main": "server2.js",
+    "main": "server.js",
     "scripts": {
-        "start": "node server2"
+        "start": "node server"
     },
     "routes": {
         "cors": true
@@ -12,7 +12,6 @@
     "author": "Ali Hassan",
     "license": "MIT",
     "dependencies": {
-        "express": "^4.17.1",
         "axios": "^0.19.2",
         "cloudinary": "^1.22.0",
         "formidable": "latest",

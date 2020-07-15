@@ -125,8 +125,13 @@ function uploadFile(request, response) {
         body,
         config
       );
+      response.write(
+        JSON.stringify({
+          fileURL: url,
+        })
+      );
+      response.end();
       console.log(url);
-      return response;
     } catch (err) {
       console.log(err.message);
     }
