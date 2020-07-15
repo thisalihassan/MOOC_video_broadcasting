@@ -121,7 +121,7 @@ function uploadFile(request, response) {
         config
       );
       console.log(url);
-      return url;
+      return response;
     } catch (err) {
       console.log(err.message);
     }
