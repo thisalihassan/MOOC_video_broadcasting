@@ -89,22 +89,29 @@ var fileuploads = multer({ storage: fileupload }).single("file");
 function uploadFile(request, response) {
   fileuploads(request, response, async function (err) {
     if (err instanceof multer.MulterError) {
-      return response.status(500).json(err);
+      console.log(err);
+      return response.writeHead(500);
     } else if (err) {
-      return response.status(500).json(err);
+      console.log("Here??");
+      console.log(err);
+      return response.writeHead(500);
     }
 
     try {
       const path = request.file.path;
-      var splitname = request.file.filename.split("*");
-      const uniqueFilename = splitname[1];
+      console.log(request.file.filename + "file");
+      var splitname = request.file.filename.split("(+)");
+      const uniqueFilename = splitname[1].split(".")[0].split("%20").join("");
       const result = await cloudinary.uploader.upload(path, {
         resource_type: "auto",
         public_id: `lectures/${uniqueFilename}`,
       });
+
       var url = result.secure_url;
       var room = splitname[0];
-      var filename = splitname[1].split[0];
+      console.log(room + "room");
+      var filename = uniqueFilename.split("%20").join(" ");
+      console.log(filename + "filename");
       const body = JSON.stringify({ url, room, filename });
       const config = { headers: { "Content-Type": "application/json" } };
 
@@ -116,7 +123,7 @@ function uploadFile(request, response) {
       console.log(url);
       return url;
     } catch (err) {
-      console.error(err.message);
+      console.log(err.message);
     }
     // try {
     //   const path = req.file.path;
