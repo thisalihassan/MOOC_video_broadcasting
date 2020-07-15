@@ -141,11 +141,12 @@
                         if (alreadyExist) return;
                         if (typeof roomsList === "undefined") roomsList = document.body;
                         var tr = document.createElement("tr");
+                        tr.setAttribute("id", "roomjoined");
                         tr.innerHTML =
-                            "<td><strong>" +
-                            getUrlVars()["n"] +
-                            "</strong> is broadcasting his media!</td>" +
-                            '<td><button class="join">Join</button></td>';
+                            "<td>Click to join Room" +
+                            getUrlVars()["n"].replace("%20", " ") +
+                            "</td>" +
+                            '<td><button class="btn btn-info join">Join</button></td>';
                         roomsList.appendChild(tr);
                         var joinRoomButton = tr.querySelector(".join");
                         joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
@@ -158,6 +159,7 @@
                                 roomToken: roomToken,
                                 joinUser: broadcaster,
                             });
+                            document.getElementById("roomjoined").style.display = "none";
                             hideUnnecessaryStuff();
                         };
                     },
