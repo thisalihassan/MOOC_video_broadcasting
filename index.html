@@ -139,8 +139,6 @@
               videosContainer.appendChild(htmlElement);
               document.getElementById("roomjoined").style.display = "none";
               if (getUrlVars()["z"] === "zoom") {
-                console.log("Here");
-
                 // setInterval(startCropping, 50);
                 setTimeout(getWhiteboard, 2500);
               }
@@ -425,6 +423,7 @@
                 setdata.setAttribute("value", mdata);
               });
             } else {
+              console.log("Should auto detect whiteboard again");
               RecalibrateBoard();
             }
             console.log(document.getElementById("democlass").value);
@@ -505,11 +504,11 @@
             document.getElementById("canvasid").style.display = "block";
             var video = document.getElementById("getvideo");
             var canvas = document.getElementById("canvas");
-            console.log("but yhn tak tu arha hai ALi");
+
             if (!video) {
               setTimeout(getWhiteboard, 500);
             } else {
-              console.log("yhn ana chahiye");
+              console.log("Captured whiteboard starting croppping");
               ratio = video.videoWidth / video.videoHeight;
               w = video.videoWidth - 100;
               h = parseInt(w / ratio, 10);
