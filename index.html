@@ -66,11 +66,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4, col-lg-4, col-sm-4"></div>
-                    <div id="buttons" class="col-sm-4, col-md-4, col-lg-4, col-xs-4"></div>
+                    <div id="buttons" class="col-sm-4, col-md-4, col-lg-4, col-xs-4">
+                        <div id="spinner" class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="sr-only">Loading...</span
+                ><span> Don't quit the page</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <script>
+                document.getElementById("spinner").style.display = "none";
+
                 function xhrRoomClose(url, data, data2) {
                     var request = new XMLHttpRequest();
                     request.onreadystatechange = function() {
@@ -359,6 +366,7 @@
                 }
 
                 function postFiles() {
+                    document.getElementById("spinner").style.display = "block";
                     var blob = recorder.getBlob();
 
                     // getting unique identifier for the file name
@@ -371,6 +379,7 @@
                     videoElement.src = "";
 
                     xhr("/uploadFile", file, function(responseText) {
+                        document.getElementById("spinner").style.display = "none";
                         alert("Recording upload complete");
                     });
                 }
