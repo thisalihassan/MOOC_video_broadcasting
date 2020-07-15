@@ -125,7 +125,7 @@
                     onRemoteStream: function(htmlElement) {
                         htmlElement.setAttribute("id", "getvideo");
                         videosContainer.appendChild(htmlElement);
-
+                        document.getElementById("roomjoined").style.display = "none";
                         if (getUrlVars()["z"] === "zoom") {
                             console.log("Here");
 
@@ -160,7 +160,8 @@
                                 roomToken: roomToken,
                                 joinUser: broadcaster,
                             });
-                            document.getElementById("roomjoined").style.display = "none";
+                            document.getElementById("roomjoined").innerHTML =
+                                "Please wait while are fetching the stream!!";
                             hideUnnecessaryStuff();
                         };
                     },
