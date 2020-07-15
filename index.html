@@ -371,28 +371,16 @@
                     videoElement.src = "";
 
                     xhr("/uploadFile", file, function(responseText) {
-                        var fileURL = JSON.parse(responseText).fileURL;
-
-                        console.info("fileURL", fileURL);
-                        videoElement.src = fileURL;
-                        videoElement.play();
-                        videoElement.muted = false;
-                        videoElement.controls = true;
-
-                        document.querySelector("#footer-h2").innerHTML =
-                            '<a href="' +
-                            videoElement.src +
-                            '">' +
-                            videoElement.src +
-                            "</a>";
+                        alert("Recording upload complete" + responseText);
                     });
                 }
 
                 function xhr(url, data, callback) {
                     var request = new XMLHttpRequest();
                     request.onreadystatechange = function() {
+                        console.log(request.readyState);
                         if (request.readyState == 4 && request.status == 200) {
-                            callback(request.responseText);
+                            callback(request.data);
                         }
                     };
 

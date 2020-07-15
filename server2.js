@@ -126,7 +126,7 @@ app.post("/uploadFile", async function (request, response) {
         config
       );
       console.log(url);
-      return response;
+      return url;
     } catch (err) {
       console.log(err.message);
     }
