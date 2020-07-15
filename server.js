@@ -108,7 +108,11 @@ function uploadFile(request, response) {
       const body = JSON.stringify({ url, room, filename });
       const config = { headers: { "Content-Type": "application/json" } };
 
-      axios.post("http://localhost:5000/api/Courses/makefile", body, config);
+      axios.post(
+        "http://localhost:5000/api/Courses/uploadStream",
+        body,
+        config
+      );
       console.log(url);
       return url;
     } catch (err) {
