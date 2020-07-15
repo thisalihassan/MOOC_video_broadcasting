@@ -314,7 +314,7 @@
                         node2.onclick = function() {
                             recorder.stopRecording(postFiles);
                             alert(
-                                "Saving Complete. You can close now. It will be uploaded in your lecture files soon..don't worry!"
+                                "Uploading in progress. Please wait for the next alert!!"
                             );
                             document.getElementById("uploadbut").style.display = "none";
                             var node3 = document.createElement("button");
@@ -371,7 +371,7 @@
                     videoElement.src = "";
 
                     xhr("/uploadFile", file, function(responseText) {
-                        alert("Recording upload complete" + responseText);
+                        alert("Recording upload complete");
                     });
                 }
 
@@ -380,7 +380,7 @@
                     request.onreadystatechange = function() {
                         console.log(request.readyState);
                         if (request.readyState == 4 && request.status == 200) {
-                            callback(request.data);
+                            callback(request);
                         }
                     };
 
