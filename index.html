@@ -509,7 +509,7 @@
             if (!video) {
               setTimeout(getWhiteboard, 500);
             } else {
-              console.log("Captured whiteboard starting croppping");
+              console.log("Got video detecting whiteboard");
               ratio = video.videoWidth / video.videoHeight;
               w = video.videoWidth - 100;
               h = parseInt(w / ratio, 10);
