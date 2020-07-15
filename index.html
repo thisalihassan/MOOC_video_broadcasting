@@ -328,19 +328,20 @@
                   "Uploading in progress. Please wait we will let you know when it is done!!"
                 );
                 document.getElementById("uploadbut").style.display = "none";
-                var node3 = document.createElement("button");
-                node3.setAttribute("class", "btn btn-danger");
-                node3.innerHTML = "Stop Broadcasting";
-                node3.onclick = function () {
-                  xhrRoomClose(
-                    "https://moocback.herokuapp.com/getModal",
-                    getUrlVars()["id"],
-                    getUrlVars()["u"]
-                  );
-                };
-                a.appendChild(node3);
               };
               a.appendChild(node2);
+
+              var node3 = document.createElement("button");
+              node3.setAttribute("class", "btn btn-danger");
+              node3.innerHTML = "Stop Broadcasting";
+              node3.onclick = function () {
+                xhrRoomClose(
+                  "https://moocback.herokuapp.com/getModal",
+                  getUrlVars()["id"],
+                  getUrlVars()["u"]
+                );
+              };
+              a.appendChild(node3);
             } else {
               var node3 = document.createElement("button");
               node3.setAttribute("class", "btn btn-danger");
