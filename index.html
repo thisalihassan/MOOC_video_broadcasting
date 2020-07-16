@@ -150,6 +150,7 @@
               );
               if (alreadyExist) return;
               if (typeof roomsList === "undefined") roomsList = document.body;
+              console.log(room);
               var tr = document.createElement("tr");
               var rooname = getUrlVars()["n"].split("%20").join(" ");
               tr.setAttribute("id", "roomjoined");
