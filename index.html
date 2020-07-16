@@ -150,31 +150,37 @@
               );
               if (alreadyExist) return;
               if (typeof roomsList === "undefined") roomsList = document.body;
-              console.log(room);
-              var tr = document.createElement("tr");
               var rooname = getUrlVars()["n"].split("%20").join(" ");
-              tr.setAttribute("id", "roomjoined");
-              tr.innerHTML =
-                "<td> <h3>Click to join Room : " +
-                rooname +
-                " </h3> </h3>    </h3> </td>" +
-                '<td> <button class="btn btn-info join">Join</button></td>';
-              roomsList.appendChild(tr);
-              var joinRoomButton = tr.querySelector(".join");
-              joinRoomButton.setAttribute("data-broadcaster", room.broadcaster);
-              joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
-              joinRoomButton.onclick = function () {
-                this.disabled = true;
-                var broadcaster = this.getAttribute("data-broadcaster");
-                var roomToken = this.getAttribute("data-roomToken");
-                broadcastUI.joinRoom({
-                  roomToken: roomToken,
-                  joinUser: broadcaster,
-                });
-                document.getElementById("roomjoined").innerHTML =
-                  "<h3>Please wait while we are fetching the stream!!</h3>";
-                hideUnnecessaryStuff();
-              };
+              console.log(room);
+              if (room.roomName === rooname) {
+                var tr = document.createElement("tr");
+
+                tr.setAttribute("id", "roomjoined");
+                tr.innerHTML =
+                  "<td> <h3>Click to join Room : " +
+                  rooname +
+                  " </h3> </h3>    </h3> </td>" +
+                  '<td> <button class="btn btn-info join">Join</button></td>';
+                roomsList.appendChild(tr);
+                var joinRoomButton = tr.querySelector(".join");
+                joinRoomButton.setAttribute(
+                  "data-broadcaster",
+                  room.broadcaster
+                );
+                joinRoomButton.setAttribute("data-roomToken", room.broadcaster);
+                joinRoomButton.onclick = function () {
+                  this.disabled = true;
+                  var broadcaster = this.getAttribute("data-broadcaster");
+                  var roomToken = this.getAttribute("data-roomToken");
+                  broadcastUI.joinRoom({
+                    roomToken: roomToken,
+                    joinUser: broadcaster,
+                  });
+                  document.getElementById("roomjoined").innerHTML =
+                    "<h3>Please wait while we are fetching the stream!!</h3>";
+                  hideUnnecessaryStuff();
+                };
+              }
             },
             onNewParticipant: function (numberOfViewers) {
               document.title = "Viewers: " + numberOfViewers;
