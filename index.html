@@ -115,7 +115,9 @@
             openSocket: function (config) {
               var SIGNALING_SERVER = "https://signalling-kro-g.herokuapp.com/";
               // config.channel = config.channel || getUrlVars()["id"];
+              console.log(config.channel + "befoer");
               config.channel = config.channel || getUrlVars()["id"];
+              console.log(config.channel + "after");
               var sender = getUrlVars()["u"];
               io.connect(SIGNALING_SERVER).emit("new-channel", {
                 channel: config.channel,
