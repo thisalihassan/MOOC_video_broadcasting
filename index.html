@@ -426,7 +426,7 @@
                 contentType: false,
                 cache: false,
                 type: "POST",
-                url: "http://830e9ba02351.ngrok.io/getimage",
+                url: "https://1b4e6888aafa.ngrok.io/getimage",
               }).done(function (mdata) {
                 console.log("get action: " + mdata);
                 var setdata = document.getElementById("democlass2");
@@ -435,7 +435,6 @@
             } else {
               console.log("Should auto detect whiteboard again");
               setTimeout(RecalibrateBoard, 500);
-             
             }
             console.log(document.getElementById("democlass").value);
           }
@@ -460,7 +459,7 @@
               contentType: false,
               cache: false,
               type: "POST",
-              url: "https://c17d11efb2a4.ngrok.io/getWhiteboard",
+              url: "https://2cafad5a20a4.ngrok.io/getWhiteboard",
             }).done(function (data) {
               console.log("getVideo coordinates recalled: " + data);
               document.getElementById("democlass").value = data;
@@ -533,7 +532,7 @@
                 contentType: false,
                 cache: false,
                 type: "POST",
-                url: "https://c17d11efb2a4.ngrok.io/getWhiteboard",
+                url: "https://2cafad5a20a4.ngrok.io/getWhiteboard",
               }).done(function (data) {
                 console.log("getVideo coordinates: " + data);
                 var find = document.getElementById("democlass");
